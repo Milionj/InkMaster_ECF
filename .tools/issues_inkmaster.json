@@ -1,0 +1,157 @@
+[
+  {
+    "title": "US 1 – Page d’accueil",
+    "body": "Vitrine du salon avec services et avis clients validés.",
+    "labels": [
+      "front",
+      "UX"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 2 – Menu de navigation",
+    "body": "Menu accessible sur toutes les pages vers accueil, artistes, contact, etc.",
+    "labels": [
+      "front",
+      "navigation"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 3 – Vue des services",
+    "body": "Affichage dynamique des services configurables par l’administrateur.",
+    "labels": [
+      "front",
+      "back"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 4 – Galerie des artistes",
+    "body": "Vue globale + vue détaillée des artistes et de leurs créations.",
+    "labels": [
+      "front",
+      "media"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 5 – Gestion des avis",
+    "body": "Formulaire visiteurs + validation manuelle par l’employé avant affichage.",
+    "labels": [
+      "front",
+      "back",
+      "moderation"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 6 – Espace administrateur",
+    "body": "Gestion des comptes artistes, contenus, services et statistiques.",
+    "labels": [
+      "admin",
+      "back"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 7 – Espace artiste",
+    "body": "Zone personnelle pour gérer les créations et voir les avis.",
+    "labels": [
+      "front",
+      "back",
+      "artist"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 8 – Système de connexion",
+    "body": "Connexion sécurisée pour artistes et administrateurs (pas d'inscription publique).",
+    "labels": [
+      "auth",
+      "security"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 9 – Formulaire de contact",
+    "body": "Formulaire pour envoyer un message au salon avec email, titre et description.",
+    "labels": [
+      "contact",
+      "form"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "US 10 – Statistiques des artistes",
+    "body": "Comptage des vues des profils artistes avec affichage dans le dashboard admin (NoSQL).",
+    "labels": [
+      "stats",
+      "NoSQL",
+      "admin"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Installation Docker",
+    "body": "Création des fichiers Docker nécessaires au déploiement de l’app.",
+    "labels": [
+      "devops",
+      "docker"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Création de la base MySQL",
+    "body": "Modélisation MCD, MPD + création des scripts SQL.",
+    "labels": [
+      "database",
+      "MySQL"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Création des maquettes et wireframes",
+    "body": "3 versions desktop et 3 versions mobile avec la charte graphique.",
+    "labels": [
+      "design",
+      "UX"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Intégration Firebase ou MongoDB",
+    "body": "Connexion d’une base NoSQL pour stocker les statistiques.",
+    "labels": [
+      "database",
+      "NoSQL"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Sécurisation des inputs (XSS/SQL injection)",
+    "body": "Validation des données côté front-end et back-end.",
+    "labels": [
+      "security",
+      "validation"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Responsive complet",
+    "body": "Optimisation de l'affichage pour mobile, tablette et desktop.",
+    "labels": [
+      "responsive",
+      "UX"
+    ],
+    "assignees": []
+  },
+  {
+    "title": "Ajout README et documentation technique",
+    "body": "Ajout d’un README complet avec instructions de déploiement et archi technique.",
+    "labels": [
+      "documentation"
+    ],
+    "assignees": []
+  }
+]

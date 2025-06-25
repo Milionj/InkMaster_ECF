@@ -14,7 +14,7 @@ Créer une application immersive et fonctionnelle répondant aux besoins des vis
 
 ### Tableau Kanban GitHub Projects (classic)
 
-Colonnes recommandées :
+Colonnes :
 - `Backlog`
 - `À faire`
 - `En cours`
@@ -28,7 +28,7 @@ Colonnes recommandées :
 
 ---
 
-##  Organisation recommandée
+##  Organisation
 
 - `/front` → projet React
 - `/back` → API Node/Express
@@ -37,7 +37,7 @@ Colonnes recommandées :
 
 ---
 
-## 📎 Liens utiles
+## Liens utiles
 
 - [Tableau Kanban GitHub](https://github.com/Milionj/InkMaster_ECF/projects)
 - [Labels GitHub](https://github.com/Milionj/InkMaster_ECF/labels)

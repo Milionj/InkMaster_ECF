@@ -5,7 +5,7 @@ Projet de développement d'une application web complète pour le salon de tatoua
 
 Créer une application immersive et fonctionnelle répondant aux besoins des visiteurs, des artistes tatoueurs et de l'administrateur du salon.
 
-- **Front-end** : HTML5, CSS (Tailwind/Bootstrap), JavaScript, React.js
+- **Front-end** : HTML5, CSS (Tailwind/Bootstrap), JavaScript, React.js + vite
 - **Back-end** : Node.js, Express.js
 - **Base de données** : MySQL (relationnelle) + Firebase ou MongoDB (NoSQL)
 - **Outils** : Docker, GitHub, GitHub Projects, GitHub CLI
@@ -44,6 +44,19 @@ Colonnes :
 - [Issues](https://github.com/Milionj/InkMaster_ECF/issues)
 
 ---
+
+# Front – InkMaster
+
+Projet React (Vite + JSX)
+
+
+## Lancer le projet
+
+```bash
+cd front
+npm install
+npm run dev
+
 
 ## Auteur
 

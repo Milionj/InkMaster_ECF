@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Navbar.css'; // On importe le fichier CSS de la navbar
 
 function Navbar() {

@@ -6,6 +6,7 @@ import Artistes from './pages/Artistes/Artiste';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Login/Login';
 import Services from './pages/Services/Services';
+import Footer from './components/Footer/Footer';
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
     <Route path="/login" element={<Login/>}/>
     <Route path="/services" element={<Services/>}/>
   </Routes>
+  <Footer />
     </Router>
   );
 };

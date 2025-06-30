@@ -1,0 +1,55 @@
+.home-container {
+  font-family: 'Squada One', sans-serif;
+  max-width: 1200px;
+  padding-top: 80px;
+  margin: 0 auto;
+}
+
+body {
+    background-color: #E5E5E5;
+}
+
+
+.hero-section {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f5f5f5;
+    min-height: 100vh;
+}
+
+.hero-section h1 {
+  font-size: 2.7rem;
+  margin-bottom: 1rem;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  color: black;
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.presentation-section {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #ffffff;
+}
+
+.presentation-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.presentation-section p {
+  max-width: 600px;
+  margin: 0 auto 40px;
+  color: black;
+  font-size: 1.2rem;
+}

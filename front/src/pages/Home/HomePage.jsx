@@ -45,7 +45,7 @@ const HomePage = () =>{
   </div>
 
     <div className="location-info">
-      <p>
+      <p className="info">
         Nous sommes situé dans l’un des quartiers les plus beaux et animés de Paris :
       </p>
       <h3>3 RUE LEMERCIER 75017 PARIS</h3>

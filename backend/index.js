@@ -3,19 +3,21 @@ import cors from 'cors'; // pour autoriser les apples API depuis un autre domain
 import dotenv from 'dotenv'; //  pour lier les variable d'environement vers un fichier .env
 import db from './db.js'; // pour la co a la bdd
 import utilisateurRoutes from './routes/utilisateurs.js';
+import tatouagesRoutes from './routes/tatouage.route.js';
+import servicesRoutes from './routes/service.route.js';
 
 dotenv.config(); //charge les variable du .env dans process.env
 
 //initialisation de l'application Express 
 const app = express();  // midlewear pour autoriser les appels cross-origin (react vers Express)
 app.use(cors()); // Middleware pour permettre le parsing automatique du JSON dans les requêtes
-
-app.use('/', utilisateurRoutes);
-
 app.use(express.json());
+app.use('/', utilisateurRoutes);
+app.use('/tatouages', tatouagesRoutes);
+app.use('/services', servicesRoutes);
 
-import db from './db.js';
-// temporairer : Vérifie que la base de données est bien accessible
+
+// Vérifie que la base de données est bien accessible
 app.get('/ping-db', async (req, res) => {
     const [rows] = await db.execute('SELECT NOW() AS now');
 

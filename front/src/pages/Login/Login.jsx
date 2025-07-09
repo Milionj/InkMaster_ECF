@@ -1,7 +1,10 @@
 import { useState } from 'react'; // pour gerer l'état local (email, mot de passe, erreur)
 import axios from 'axios'; // faire la requete HTTP POST vers le backend 
 import { useNavigate } from 'react-router-dom'; //rediriger apres la connexion
+import ReCAPTCHA from "react-google-recaptcha";
 import './Login.css';
+
+
 
 export default function Login () {
     //etat pour stocker les donnée saisies dans le formulaire
@@ -10,17 +13,39 @@ export default function Login () {
     const [erreur, setErreur] = useState('');
 
     const navigate = useNavigate(); // pour rediriger vers une autre page
-
+    const [captchaToken, setCaptchaToken] = useState('');
     // connexion
 
     const handleLogin = async (e) => {
         e.preventDefault(); //empeche le rechargement de la page au click submit
 
+        const validateEmail = (email) => {
+          const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return regex.test(email);
+        };
+
+        const validatePassword = (password) => {
+          const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+          return regex.test(password);
+        };
+
+        if (!validateEmail(email)) {
+  setErreur("Email invalide");
+  return;
+}
+
+if (!validatePassword(password)) {
+  setErreur("Mot de passe invalide : au moins 6 caractères avec lettres et chiffres");
+  return;
+}
+
+
         try {
             //requete POST envoyée a l'API backend avec l'email et le mot de passe
             const res = await axios.post('http://localhost:3001/login',{
                 email,
-                password
+                password,
+                captchaToken 
             });
 
             //on recupere le token avec le role envoyé a l'API
@@ -34,7 +59,7 @@ export default function Login () {
             // connexion si admin vers dashboard
 
             if (role === 'admin') {
-                navigate('/dashboard');
+                navigate('/admin');
             } else {
             setErreur("Accèes refusé : réservé a l'administrateur.");
         }
@@ -66,7 +91,12 @@ export default function Login () {
           required
         />
 
-        <button type="submit">Connexion</button>
+    <ReCAPTCHA
+      sitekey="6LeKCXUrAAAAAJhnN1D87kWMfZ0wlLD_J7uujRmm"
+      onChange={(token) => setCaptchaToken(token)}
+    />
+
+      <button type="submit">Connexion</button>
 
         {/* Affiche un message d’erreur si nécessaire */}
         {erreur && <p className="error-msg">{erreur}</p>}

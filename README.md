@@ -31,7 +31,8 @@ Colonnes :
 ##  Organisation
 
 - `/front` → projet React
-- `/back` → API Node/Express
+- `/backend` → API Node/Express
+- `/admin` → React admin
 - `/docker` → fichiers `Dockerfile` et `docker-compose.yml`
 - `/docs` → maquettes, MCD, UML, README, présentations
 

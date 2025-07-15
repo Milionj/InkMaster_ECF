@@ -1,10 +1,6 @@
 // src/pages/Services.jsx
 import React from 'react';
 import './Services.css';
-import ArtisteEnActionGIF from '../../assets/images/ArtisteEnActionGIF.gif';
-import ThemePiercingGIF from '../../assets/images/themePiercingGIF.gif';
-import MachineTatooGIF from '../../assets/images/MachineTatooGIF.gif';
-import Soins from '../../assets/images/Soins.webp'; 
 
 const Services = () => {
   return (
@@ -12,7 +8,7 @@ const Services = () => {
       <h1>Nos Services</h1>
 
       <div className="service-card">
-        <img src={ArtisteEnActionGIF} alt="Tatouage" />
+       <img src="/images/ArtisteEnActionGIF.gif" alt=" tatouage" />
         <div>
           <h2>Tatouage</h2>
           <p>
@@ -22,7 +18,7 @@ const Services = () => {
       </div>
 
       <div className="service-card">
-        <img src={ThemePiercingGIF} alt="Piercing" />
+        <img src="/images/themePiercingGIF.gif" alt="Piercing" />
         <div>
           <h2>Piercing</h2>
           <p>
@@ -32,7 +28,7 @@ const Services = () => {
       </div>
 
       <div className="service-card">
-        <img src={MachineTatooGIF} alt="Retrait de tatouage" />
+        <img src="/images/MachineTatooGIF.gif" alt="Retrait de tatouage" />
         <div>
           <h2>Retrait de tatouage</h2>
           <p>
@@ -43,7 +39,7 @@ const Services = () => {
       <div className="care-section">
   <h2>Prenez soins de vous</h2>
   <div className="care-content">
-    <img src={Soins} alt="Soins" />
+    <img src="/images/Soins.webp" alt="Soins" />
     <div>
       <h3>Votre attention !</h3>
       <p>

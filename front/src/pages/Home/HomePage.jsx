@@ -1,7 +1,6 @@
 import React from "react";
 import GalleryCarousel from "../../components/GalleryCarousel/GalleryCarousel";
 import './HomePage.css';
-import tattooGif from '../../assets/images/video_tatoo.gif.gif';
 import CommentsSection from '../../components/CommentsSection/CommentsSection';
 // import carteImg from '../../assets/images/carte_tatoo.jpg';
 
@@ -14,7 +13,7 @@ const HomePage = () =>{
           Découvrez nos œuvres et nos artistes plus impliqués que jamais pour répondre à vos besoins :
           tatouage personnalisé, piercing et retrait au laser.
         </p>
-        <img src={tattooGif} alt="Tatouage en cours" className="hero-image" />
+       <img src="/images/video_tatoo.gif.gif" alt="Vidéo tatouage" />
       </section>
 
       <section className="presentation-section">

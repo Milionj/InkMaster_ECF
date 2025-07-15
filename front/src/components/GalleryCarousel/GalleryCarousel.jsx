@@ -1,23 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './GalleryCarousel.css';
-
-import ghostNVdie from '../../assets/images/ghostneverdie.jpg';
-import goranes from '../../assets/images/Goranes_dos_fini.jpg';
-import lutherPoisson from '../../assets/images/luther_poisson.jpg';
-import luther from '../../assets/images/Luther.jpg';
-import brest from '../../assets/images/Brest_anonyme.jpg';
-
-
-// définir un le tableau d'oeuvre fictif 
-
-const artworks = [
-  { title: 'Ghost never die', image: ghostNVdie },
-  { title: 'Goranes personnel', image: goranes },
-  { title: 'Équilibre et renouveau', image: lutherPoisson },
-  { title: 'Luther', image: luther },
-  { title: 'Brest anonyme', image: brest },
-];
-
 
 // CamelCase avec majuscule initiale (PascalCase) car c'est une fonction composant.**
 const GalleryCarousel = () => {
@@ -27,6 +10,21 @@ const GalleryCarousel = () => {
 
     // Hook React pour gerer la page actuellement affiché
     const [page, setPage] = useState(1);
+    const [artworks, setArtworks] = useState([]);
+
+    useEffect(() => {
+  const fetchTatouages = async () => {
+    try {
+      const res = await axios.get('http://localhost:3001/tatouages');
+      setArtworks(res.data);
+    } catch (err) {
+      console.error("Erreur lors du chargement des tatouages", err);
+    }
+  };
+
+  fetchTatouages();
+}, []);
+
 
     // Math.ceil() est une fonction JavaScript qui arrondit toujours un nombre à l'entier supérieur,
     // même si la partie décimale est très petite.
@@ -60,10 +58,12 @@ const GalleryCarousel = () => {
         {currentItems.map((art, index) => (
           <article key={index}>
             <figure>
-              <img src={art.image} alt={art.title} />
+              <img src={`/images/${art.image}`} alt={art.titre} />
             </figure>
             <div className="article-preview">
-              <h2>{art.title}</h2>
+            <h2>{art.titre}</h2>
+              <p>{art.description}</p>
+               <p><strong>Artiste :</strong> {art.prenom_artiste} {art.nom_artiste}</p>
             </div>
           </article>
         ))}

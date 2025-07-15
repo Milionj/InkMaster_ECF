@@ -16,6 +16,23 @@ const verifyCaptcha = async (token) => {
   return data.success;
 };
 
+// GET - Récupérer les tatouages d'un artiste spécifique
+router.get('/utilisateurs/:id/tatouages', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.execute(
+      'SELECT id_tatouage, titre, image, description FROM tatouage WHERE id_utilisateur = ?',
+      [id]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la récupération des tatouages de l\'artiste' });
+  }
+});
+
+
+
 router.get('/utilisateurs', async (req, res) => {
   try {
     const [rows] = await db.execute(
@@ -92,30 +109,28 @@ router.post('/login', async (req, res) => {
 });
 
 
-// création d'un utilisateur avec admin
-router.post('/admin/create-user', verifyToken, isAdmin, async (req, res) => {
-    const { nom, prenom, email, password, role } = req.body;
-     if (!nom || !prenom || !email || !password || !role) {
+// création d'un utilisateur 
+router.post('/utilisateurs', verifyToken, isAdmin, async (req, res) => {
+  const { nom, prenom, email, password, role } = req.body;
+  if (!nom || !prenom || !email || !password || !role) {
     return res.status(400).json({ message: 'Champs requis manquants.' });
   }
-try {
-    const hash = await bcrypt.hash(password, 10); // hash sécurisé du mot de passe
 
-     await db.execute(
+  try {
+    const hash = await bcrypt.hash(password, 10);
+    await db.execute(
       'INSERT INTO utilisateur (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)',
       [nom, prenom, email, hash, role]
     );
-
-res.status(201).json ({ message: 'Utilisateur crée avec succes.'});
-
-}catch (err){
-    if (err.code === 'ER_DUP_ENTRY') { 
-        return res.status(409).json ({ message: 'Eamil deja utilisé'}); // empêche les doublon
+    res.status(201).json({ message: 'Utilisateur créé avec succès' });
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'Email déjà utilisé' });
     }
-    console.error(err);
-    res.status(500).json({ message: 'Erreur serveur lors de la création.'});
-    }
+    res.status(500).json({ message: 'Erreur serveur lors de la création.' });
+  }
 });
+
 
 // création admin
 router.post('/admin/init', async (req, res) => {
@@ -143,7 +158,7 @@ router.delete('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
   try{
     const [result] = await db.execute( 'DELETE FROM utilisateur where id_utilisateur = ?', [id]);
 
-    if (result.affecteRows === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'utilisateur introuvable' });
     }
 
@@ -153,6 +168,35 @@ router.delete('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur lors de la suppression de la sauvegarde' });
   }
 });
+
+
+//  route pour recuperer un utilisateur (Charger un utilisateur à éditer)
+router.get('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.execute('SELECT id_utilisateur, nom, prenom, email, role FROM utilisateur WHERE id_utilisateur = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable' });
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// Modifier un utilisateur spécifique
+router.put('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
+  const { id } = req.params; // 	ID de la personne à modifier
+  const { nom, prenom, email, role } = req.body; // 	Nouvelles données envoyées
+  try {
+    await db.execute(
+      'UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id_utilisateur = ?',
+      [nom, prenom, email, role, id]
+    );
+    res.json({ message: 'Utilisateur modifié avec succès' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 
 
 

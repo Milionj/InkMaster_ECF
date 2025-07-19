@@ -1,18 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
 import Navbar from './components/Navbar/Navbar';
 import HomePage from './pages/Home/HomePage';
 import Artistes from './pages/Artistes/Artiste';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Login/Login';
 import Services from './pages/Services/Services';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer/Footer';
-import AdminPanel from './pages/AdminPanel';
 
-const App = () => {
-  //  Vérification simple : connecté + admin
-  const isAdmin = localStorage.getItem('token') && localStorage.getItem('role') === 'admin';
-
+export default function App() {
   return (
     <Router>
       <Navbar />
@@ -22,21 +19,9 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/services" element={<Services />} />
-
-        {/*  Protection de l'interface admin */}
-        <Route
-          path="/admin/*"
-          element={
-            isAdmin ? <AdminPanel /> : <Navigate to="/login" />
-          }
-        />
-
-        {/* Ancien dashboard désactivé */}
-        {/* <Route path="/dashboard" element={<DashboardAdmin />} /> */}
+       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       </Routes>
       <Footer />
     </Router>
   );
-};
-
-export default App;
+}

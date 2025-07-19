@@ -4,19 +4,30 @@ import { verifyToken, isAdmin } from '../middleware/verifyToken.js';
 
 const router = express.Router();
 
-// Lire tous les services
-router.get('/', async (req, res) => {
+// GET - Liste des services
+router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
-    const [rows] = await db.execute('SELECT * FROM service');
-    res.set('Access-Control-Expose-Headers', 'Content-Range');
-    res.set('Content-Range', `services 0-${rows.length - 1}/${rows.length}`);
+    const [rows] = await db.execute('SELECT id_service AS id, nom, description FROM service');
     res.json(rows);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des services' });
   }
 });
 
-// Créer un service
+// GET - Détail d’un service
+router.get('/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const [rows] = await db.execute('SELECT id_service AS id, nom, description FROM service WHERE id_service = ?', [req.params.id]);
+
+    if (rows.length === 0) return res.status(404).json({ message: 'Service non trouvé' });
+
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération du service' });
+  }
+});
+
+// POST - Créer un service
 router.post('/', verifyToken, isAdmin, async (req, res) => {
   const { nom, description } = req.body;
   try {
@@ -24,35 +35,33 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
       'INSERT INTO service (nom, description) VALUES (?, ?)',
       [nom, description]
     );
-    res.status(201).json({ message: 'Service créé avec succès' });
+    res.status(201).json({ message: 'Service créé' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la création du service' });
   }
 });
 
-// Modifier un service
+// PUT - Modifier un service
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   const { nom, description } = req.body;
-  const { id } = req.params;
   try {
     await db.execute(
       'UPDATE service SET nom = ?, description = ? WHERE id_service = ?',
-      [nom, description, id]
+      [nom, description, req.params.id]
     );
-    res.json({ message: 'Service mis à jour' });
+    res.json({ message: 'Service modifié' });
   } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la mise à jour du service' });
+    res.status(500).json({ message: 'Erreur lors de la modification' });
   }
 });
 
-// Supprimer un service
+// DELETE - Supprimer un service
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
-  const { id } = req.params;
   try {
-    await db.execute('DELETE FROM service WHERE id_service = ?', [id]);
+    await db.execute('DELETE FROM service WHERE id_service = ?', [req.params.id]);
     res.json({ message: 'Service supprimé' });
   } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la suppression du service' });
+    res.status(500).json({ message: 'Erreur lors de la suppression' });
   }
 });
 

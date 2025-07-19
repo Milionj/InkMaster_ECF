@@ -1,106 +1,100 @@
-import { useState } from 'react'; // pour gerer l'état local (email, mot de passe, erreur)
-import axios from 'axios'; // faire la requete HTTP POST vers le backend 
-import { useNavigate } from 'react-router-dom'; //rediriger apres la connexion
+import { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from "react-google-recaptcha";
 import './Login.css';
 
-
-
-export default function Login () {
-    //etat pour stocker les donnée saisies dans le formulaire
+export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [captchaToken, setCaptchaToken] = useState('');
     const [erreur, setErreur] = useState('');
 
-    const navigate = useNavigate(); // pour rediriger vers une autre page
-    const [captchaToken, setCaptchaToken] = useState('');
-    // connexion
+    const navigate = useNavigate();
+
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+        return regex.test(password);
+    };
 
     const handleLogin = async (e) => {
-        e.preventDefault(); //empeche le rechargement de la page au click submit
+        e.preventDefault();
 
-        const validateEmail = (email) => {
-          const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          return regex.test(email);
-        };
-
-        const validatePassword = (password) => {
-          const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-          return regex.test(password);
-        };
-
+        // Vérifications des champs
         if (!validateEmail(email)) {
-  setErreur("Email invalide");
-  return;
-}
+            setErreur("Email invalide");
+            return;
+        }
 
-if (!validatePassword(password)) {
-  setErreur("Mot de passe invalide : au moins 6 caractères avec lettres et chiffres");
-  return;
-}
-
+        if (!validatePassword(password)) {
+            setErreur("Mot de passe invalide : au moins 6 caractères avec lettres et chiffres");
+            return;
+        }
 
         try {
-            //requete POST envoyée a l'API backend avec l'email et le mot de passe
-            const res = await axios.post('http://localhost:3001/login',{
+            // Appel API vers le backend (route corrigée)
+            const res = await axios.post('http://localhost:3001/login', {
                 email,
                 password,
-                captchaToken 
+                captchaToken
             });
-
-            //on recupere le token avec le role envoyé a l'API
 
             const { token, role } = res.data;
 
-            //on stock ces donnée dans le localStorage pour le utiliser plus tard
+            // Stockage dans le localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
 
-            // connexion si admin vers dashboard
-
+            // Redirection selon le rôle
             if (role === 'admin') {
-                navigate('/admin');
+                navigate('/dashboard');
             } else {
-            setErreur("Accèes refusé : réservé a l'administrateur.");
+                setErreur("Accès refusé : réservé à l'administrateur.");
+            }
+
+        } catch (err) {
+            console.error(err);
+            setErreur("Email ou mot de passe incorrect.");
         }
-    } catch (err) {
-        setErreur("Email ou mot de passe incorrect.");
-    }
-};
+    };
 
- return (
-    <div className="login-page">
-      <h1>Connexion</h1>
+    return (
+        <div className="login-page">
+            <h1>Connexion</h1>
 
-      <form onSubmit={handleLogin} className="login-box">
-        <label>Email</label>
-        <input
-          type="email"
-          placeholder="email valide"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+            <form onSubmit={handleLogin} className="login-box">
+                <label>Email</label>
+                <input
+                    type="email"
+                    placeholder="email valide"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
 
-        <label>Mot de passe</label>
-        <input
-          type="password"
-          placeholder="mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+                <label>Mot de passe</label>
+                <input
+                    type="password"
+                    placeholder="mot de passe"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
 
-    <ReCAPTCHA
-      sitekey="6LeKCXUrAAAAAJhnN1D87kWMfZ0wlLD_J7uujRmm"
-      onChange={(token) => setCaptchaToken(token)}
-    />
+                <ReCAPTCHA
+                    sitekey="6LeKCXUrAAAAAJhnN1D87kWMfZ0wlLD_J7uujRmm"
+                    onChange={(token) => setCaptchaToken(token)}
+                />
 
-      <button type="submit">Connexion</button>
+                <button type="submit">Connexion</button>
 
-        {/* Affiche un message d’erreur si nécessaire */}
-        {erreur && <p className="error-msg">{erreur}</p>}
-      </form>
-    </div>
-  );
+                {erreur && <p className="error-msg">{erreur}</p>}
+            </form>
+        </div>
+    );
 }

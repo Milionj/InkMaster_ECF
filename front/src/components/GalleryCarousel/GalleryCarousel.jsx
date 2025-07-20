@@ -17,7 +17,7 @@ const GalleryCarousel = () => {
     const fetchTatouages = async () => {
       try {
         // Requête vers le backend pour récupérer les tatouages
-const res = await axios.get('http://localhost:3001/api/tatouages/public', {
+const res = await axios.get('http://localhost:5000/api/tatouages/public', {
   headers: { 'Accept': 'application/json' } // Aucune autorisation requise
 });
 

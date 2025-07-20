@@ -21,9 +21,9 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-    const usersRes = await axios.get('http://localhost:3001/api/utilisateurs', config);
-    const tattoosRes = await axios.get('http://localhost:3001/api/tatouages', config);
-    const servicesRes = await axios.get('http://localhost:3001/api/services', config);
+    const usersRes = await axios.get('http://localhost:5000/api/utilisateurs', config);
+    const tattoosRes = await axios.get('http://localhost:5000/api/tatouages', config);
+    const servicesRes = await axios.get('http://localhost:5000/api/services', config);
       setUsers(usersRes.data);
       setTattoos(tattoosRes.data);
       setServices(servicesRes.data);
@@ -35,55 +35,55 @@ export default function Dashboard() {
 
   // CRUD UTILISATEURS
   const creerUser = async () => {
-    await axios.post('http://localhost:3001/api/utilisateurs', newUser, config);
+    await axios.post('http://localhost:5000/api/utilisateurs', newUser, config);
     setNewUser({ nom: '', prenom: '', email: '', password: '', role: 'artiste' });
     fetchData();
   };
 
   const modifierUser = async (id, champ, valeur) => {
     const userToUpdate = users.find(u => u.id === id);
-    await axios.put(`http://localhost:3001/api/utilisateurs/${id}`, { ...userToUpdate, [champ]: valeur }, config);
+    await axios.put(`http://localhost:5000/api/utilisateurs/${id}`, { ...userToUpdate, [champ]: valeur }, config);
     fetchData();
   };
 
   const supprimerUser = async (id) => {
-    await axios.delete(`http://localhost:3001/api/utilisateurs/${id}`, config);
+    await axios.delete(`http://localhost:5000/api/utilisateurs/${id}`, config);
     fetchData();
   };
 
   // CRUD TATOUAGES
   const creerTattoo = async () => {
-    await axios.post('http://localhost:3001/api/tatouages', newTattoo, config);
+    await axios.post('http://localhost:5000/api/tatouages', newTattoo, config);
     setNewTattoo({ titre: '', description: '', image: '', id_utilisateur: '' });
     fetchData();
   };
 
   const modifierTattoo = async (id, champ, valeur) => {
     const tattooToUpdate = tattoos.find(t => t.id === id);
-    await axios.put(`http://localhost:3001/api/tatouages/${id}`, { ...tattooToUpdate, [champ]: valeur }, config);
+    await axios.put(`http://localhost:5000/api/tatouages/${id}`, { ...tattooToUpdate, [champ]: valeur }, config);
     fetchData();
   };
 
   const supprimerTattoo = async (id) => {
-    await axios.delete(`http://localhost:3001/api/tatouages/${id}`, config);
+    await axios.delete(`http://localhost:5000/api/tatouages/${id}`, config);
     fetchData();
   };
 
   // CRUD SERVICES
   const creerService = async () => {
-    await axios.post('http://localhost:3001/api/services', newService, config);
+    await axios.post('http://localhost:5000/api/services', newService, config);
     setNewService({ nom: '', description: '' });
     fetchData();
   };
 
   const modifierService = async (id, champ, valeur) => {
     const serviceToUpdate = services.find(s => s.id === id);
-    await axios.put(`http://localhost:3001/api/services/${id}`, { ...serviceToUpdate, [champ]: valeur }, config);
+    await axios.put(`http://localhost:5000/api/services/${id}`, { ...serviceToUpdate, [champ]: valeur }, config);
     fetchData();
   };
 
   const supprimerService = async (id) => {
-    await axios.delete(`http://localhost:3001/api/services/${id}`, config);
+    await axios.delete(`http://localhost:5000/api/services/${id}`, config);
     fetchData();
   };
 

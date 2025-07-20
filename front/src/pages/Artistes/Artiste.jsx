@@ -15,19 +15,19 @@ const Artistes = () => {
   // useEffect pour charger les tatouages au montage du composant
   useEffect(() => {
     // Récupérer les tatouages de Webs (id_utilisateur = 16)
-    fetch('http://localhost:3001/api/utilisateurs/16/tatouages')
+    fetch('http://localhost:5000/api/utilisateurs/16/tatouages')
       .then(res => res.json())
       .then(data => setTatouagesWebs(data));
 
       
 
     // Récupérer les tatouages de Jade (id_utilisateur = 17)
-    fetch('http://localhost:3001/api/utilisateurs/17/tatouages')
+    fetch('http://localhost:5000/api/utilisateurs/17/tatouages')
       .then(res => res.json())
       .then(data => setTatouagesJade(data));
 
     // Récupérer les tatouages de Crusher (id_utilisateur = 18)
-    fetch('http://localhost:3001/api/utilisateurs/18/tatouages')
+    fetch('http://localhost:5000/api/utilisateurs/18/tatouages')
       .then(res => res.json())
       .then(data => setTatouagesCrusher(data));
   }, []); // Le tableau vide signifie : exécuter ce code 1 fois au chargement

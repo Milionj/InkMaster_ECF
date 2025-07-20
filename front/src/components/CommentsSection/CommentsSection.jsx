@@ -1,77 +1,84 @@
 import React, { useState, useEffect } from 'react';
 import './CommentsSection.css';
+import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from "firebase/firestore";
+import { db } from "../../firebase"; //  `db` exporté dans le fichier firebase.js
 
 const CommentsSection = () => {
-  //  États pour gérer le formulaire et les commentaires
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState(''); // 
+  const [message, setMessage] = useState('');
   const [confirmation, setConfirmation] = useState('');
-  const [rating, setRating] = useState(0); // note de 1 à 5
+  const [rating, setRating] = useState(0);
   const [comments, setComments] = useState([]);
 
-  //  useEffect exécuté une fois au chargement (componentDidMount)
+  // Charger les commentaires validés depuis Firestore
   useEffect(() => {
-    setComments([
-      {
-        email: 'inkfan@mail.com',
-        message: 'Super ambiance, j’ai adoré mon tatouage !',
-        rating: 5,
-        approved: true
-      },
-      {
-        email: 'client@paris.com',
-        message: 'Salon très pro et propre. Merci !',
-        rating: 4,
-        approved: true
-      },
-    ]);
+    const fetchComments = async () => {
+      try {
+        const q = query(
+          collection(db, "avis"),
+          where("approved", "==", true),
+          orderBy("createdAt", "desc")
+        );
+
+        const querySnapshot = await getDocs(q);
+        const loadedComments = querySnapshot.docs.map(doc => doc.data());
+        setComments(loadedComments);
+      } catch (error) {
+        console.error("Erreur lors du chargement des commentaires :", error);
+      }
+    };
+
+    fetchComments();
   }, []);
 
-  //  Fonction de gestion de l'envoi du formulaire
-  const handleSubmit = (e) => {
+  // Envoi d'un commentaire dans Firestore
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simule l'ajout d'un commentaire (non approuvé)
-    setComments(prev => [
-      ...prev,
-      { email, message, rating, approved: false }
-    ]);
+    try {
+      await addDoc(collection(db, "avis"), {
+        email,
+        message,
+        rating,
+        approved: false, // L'admin devra valider ce commentaire
+        createdAt: serverTimestamp()
+      });
 
-    setConfirmation('Merci pour votre commentaire, il sera validé sous peu.');
-    setEmail('');
-    setMessage('');
-    setRating(0);
+      setConfirmation('Merci pour votre commentaire, il sera validé sous peu.');
+      setEmail('');
+      setMessage('');
+      setRating(0);
 
-    setTimeout(() => setConfirmation(''), 5000);
+      setTimeout(() => setConfirmation(''), 5000);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du commentaire :", error);
+    }
   };
- return (
+
+  return (
     <section id="avis-section">
       <h2>Avis des visiteurs</h2>
 
       <div className="comments-container">
-        {/* Zone qui affiche uniquement les commentaires validés */}
+
+        {/* Affichage des commentaires validés */}
         <div className="comments-list">
-          {comments
-            .filter(comment => comment.approved) // Ne garde que ceux approuvés
-            .map((comment, idx) => (
-              <div key={idx} className="comment">
-                <strong>{comment.email}</strong>
-                <p>{comment.message}</p>
-                {comment.rating && (
-                  <div className="comment-rating">
-                    {"★".repeat(comment.rating)}{"☆".repeat(5 - comment.rating)}
-                  </div>
-                )}
-              </div>
-            ))}
+          {comments.map((comment, idx) => (
+            <div key={idx} className="comment">
+              <strong>{comment.email}</strong>
+              <p>{comment.message}</p>
+              {comment.rating && (
+                <div className="comment-rating">
+                  {"★".repeat(comment.rating)}{"☆".repeat(5 - comment.rating)}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* Affiche un message de confirmation si besoin */}
-        {confirmation && (
-          <p className="confirmation-message">{confirmation}</p>
-        )}
+        {confirmation && <p className="confirmation-message">{confirmation}</p>}
 
-        {/* Formulaire de soumission de commentaire */}
+        {/* Formulaire d'ajout de commentaire */}
         <form className="comment-form" onSubmit={handleSubmit}>
           <label htmlFor="email">Adresse e-mail</label>
           <input
@@ -79,7 +86,7 @@ const CommentsSection = () => {
             id="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)} // Met à jour le state à chaque frappe
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <label htmlFor="message">Message</label>
@@ -87,28 +94,28 @@ const CommentsSection = () => {
             id="message"
             required
             value={message}
-            onChange={(e) => setMessage(e.target.value)} // Met à jour le state à chaque frappe
+            onChange={(e) => setMessage(e.target.value)}
           ></textarea>
 
-          {/*  les étoiles dans le formulaire */}
-            <div className="rating-stars">
-          <label>Note :</label>
-          {[1, 2, 3, 4, 5].map((star) => (
-            <span
-              key={star}
-              className={star <= rating ? "star filled" : "star"}
-              onClick={() => setRating(star)}
-            >
-              ★
-            </span>
-          ))}
-        </div>
+          <div className="rating-stars">
+            <label>Note :</label>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={star <= rating ? "star filled" : "star"}
+                onClick={() => setRating(star)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
 
-          <button type="submit">Envoyer</button> {/* Soumet le formulaire */}
+          <button type="submit">Envoyer</button>
         </form>
+
       </div>
     </section>
   );
-  ;}
+};
 
-export default CommentsSection; 
+export default CommentsSection;

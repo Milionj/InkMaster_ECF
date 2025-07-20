@@ -1,20 +1,23 @@
 # Image Node officielle
 FROM node:20
 
-# Dossier de travail dans le conteneur
 WORKDIR /app
 
-# Copier package.json et package-lock.json
 COPY package*.json ./
 
-# Installer les dépendances
 RUN npm install
 
-# Copier tout le projet
 COPY . .
 
-# Exposer le port de l'API
+# Installer netcat (nc)
+RUN apt-get update && apt-get install -y netcat-openbsd
+
+# Copier wait-for-it.sh
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+# Exposer le port
 EXPOSE 5000
 
-# Lancer le serveur
-CMD ["npm", "start"]
+# Démarrer avec wait-for-it pour attendre MySQL
+CMD ["/wait-for-it.sh", "db:3306", "--", "npm", "start"]

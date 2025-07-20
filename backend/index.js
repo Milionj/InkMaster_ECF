@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import db from './db.js';
-// Même si je ne l’utilises pas directement, l’import initialise la connexion MySQL grâce à la configuration de mon fichier
 
+import avisRouter from './routes/avis.route.js';
 import utilisateurRoutes from './routes/utilisateurs.js';
 import tatouageRoutes from './routes/tatouage.route.js';
 import serviceRoutes from './routes/service.route.js';
@@ -12,13 +12,22 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // autorise ton front
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true
+}));
+
+
 app.use(express.json());
 
 app.use('/api/utilisateurs', utilisateurRoutes);
 app.use('/api/tatouages', tatouageRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api', avisRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Serveur backend lancé sur http://localhost:${process.env.PORT}`);
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`Serveur backend lancé sur http://localhost:${PORT}`);
 });

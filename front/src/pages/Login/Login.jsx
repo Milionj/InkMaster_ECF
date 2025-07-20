@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from "react-google-recaptcha";
+import { useRef } from 'react';
 import './Login.css';
 
 export default function Login() {
@@ -9,6 +10,8 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [captchaToken, setCaptchaToken] = useState('');
     const [erreur, setErreur] = useState('');
+    const recaptchaRef = useRef(null); // Ajoute un useRef pour le recaptcha
+
 
     const navigate = useNavigate();
 
@@ -37,8 +40,8 @@ export default function Login() {
         }
 
         try {
-            // Appel API vers le backend (route corrigée)
-            const res = await axios.post('http://localhost:3001/login', {
+            // Appel API vers le backend (definie dans utilisateurs.js)
+            const res = await axios.post('http://localhost:3001/api/utilisateurs/login', { 
                 email,
                 password,
                 captchaToken
@@ -51,16 +54,24 @@ export default function Login() {
             localStorage.setItem('role', role);
 
             // Redirection selon le rôle
-            if (role === 'admin') {
-                navigate('/dashboard');
-            } else {
-                setErreur("Accès refusé : réservé à l'administrateur.");
-            }
+     if (role === 'admin') {
+            navigate('/dashboard');
+        } else if (role === 'artiste') {
+            navigate('/'); // page réservée aux artistes
+        } else {
+            setErreur("Rôle inconnu.");
+        }
+
 
         } catch (err) {
             console.error(err);
             setErreur("Email ou mot de passe incorrect.");
         }
+
+        if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+        
+}
     };
 
     return (
@@ -89,6 +100,7 @@ export default function Login() {
                 <ReCAPTCHA
                     sitekey="6LeKCXUrAAAAAJhnN1D87kWMfZ0wlLD_J7uujRmm"
                     onChange={(token) => setCaptchaToken(token)}
+                    ref={recaptchaRef}
                 />
 
                 <button type="submit">Connexion</button>

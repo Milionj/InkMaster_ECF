@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 
 const router = express.Router();
 
-//  Fonction reCAPTCHA
+// Fonction pour vérifier le captcha avec Google reCAPTCHA
 const verifyCaptcha = async (token) => {
   const response = await fetch(
     `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${token}`,
@@ -17,7 +17,7 @@ const verifyCaptcha = async (token) => {
   return data.success;
 };
 
-//  Connexion utilisateur (admin ou artiste)
+// ------------------ LOGIN ------------------
 router.post('/login', async (req, res) => {
   const { email, password, captchaToken } = req.body;
 
@@ -45,26 +45,24 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// CRUD UTILISATEUR (admin uniquement)
+// ------------------ CRUD UTILISATEURS ------------------
 
-// GET - Liste tous les utilisateurs
-// Récupérer les tatouages d’un artiste spécifique
-router.get('/:id/tatouages', async (req, res) => {
+// GET - Liste de tous les utilisateurs (Admin uniquement)
+// Route : GET /api/utilisateurs
+router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
     const [rows] = await db.execute(
-      'SELECT id_tatouage, titre, image, description FROM tatouage WHERE id_utilisateur = ?',
-      [id]
+      'SELECT id_utilisateur AS id, nom, prenom, email, role FROM utilisateur'
     );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des tatouages' });
+    res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs' });
   }
 });
 
-
-// POST - Créer un utilisateur
-router.post('/utilisateurs', verifyToken, isAdmin, async (req, res) => {
+// POST - Créer un utilisateur (Admin uniquement)
+// Route : POST /api/utilisateurs
+router.post('/', verifyToken, isAdmin, async (req, res) => {
   const { nom, prenom, email, password, role } = req.body;
 
   if (!nom || !prenom || !email || !password || !role) {
@@ -84,23 +82,9 @@ router.post('/utilisateurs', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-// PUT - Modifier un utilisateur
-router.put('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
-  const { nom, prenom, email, role } = req.body;
-
-  try {
-    await db.execute(
-      'UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id_utilisateur = ?',
-      [nom, prenom, email, role, req.params.id]
-    );
-    res.json({ message: 'Utilisateur modifié' });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la modification' });
-  }
-});
-
-// GET - Récupérer un utilisateur par ID (pour pré-remplir un formulaire si besoin)
-router.get('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
+// GET - Récupérer un utilisateur par ID (Admin uniquement)
+// Route : GET /api/utilisateurs/:id
+router.get('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const [rows] = await db.execute(
       'SELECT id_utilisateur AS id, nom, prenom, email, role FROM utilisateur WHERE id_utilisateur = ?',
@@ -114,8 +98,25 @@ router.get('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-// DELETE - Supprimer un utilisateur
-router.delete('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
+// PUT - Modifier un utilisateur (Admin uniquement)
+// Route : PUT /api/utilisateurs/:id
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
+  const { nom, prenom, email, role } = req.body;
+
+  try {
+    await db.execute(
+      'UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id_utilisateur = ?',
+      [nom, prenom, email, role, req.params.id]
+    );
+    res.json({ message: 'Utilisateur modifié' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la modification' });
+  }
+});
+
+// DELETE - Supprimer un utilisateur (Admin uniquement)
+// Route : DELETE /api/utilisateurs/:id
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const [result] = await db.execute('DELETE FROM utilisateur WHERE id_utilisateur = ?', [req.params.id]);
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Utilisateur introuvable' });
@@ -126,8 +127,11 @@ router.delete('/utilisateurs/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-//  Récupérer les tatouages d’un artiste spécifique
-router.get('/utilisateurs/:id/tatouages', async (req, res) => {
+// ------------------ TATOUAGES D'UN ARTISTE ------------------
+
+// GET - Récupérer les tatouages d’un artiste spécifique
+// Route : GET /api/utilisateurs/:id/tatouages
+router.get('/:id/tatouages', async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.execute(
@@ -140,7 +144,10 @@ router.get('/utilisateurs/:id/tatouages', async (req, res) => {
   }
 });
 
-//  Créer un admin initial (optionnel, pour init rapide)
+// ------------------ ADMIN INIT (optionnel) ------------------
+
+// POST - Créer un admin par défaut si besoin
+// Route : POST /api/utilisateurs/admin/init
 router.post('/admin/init', async (req, res) => {
   try {
     const hash = await bcrypt.hash('admin123', 10);

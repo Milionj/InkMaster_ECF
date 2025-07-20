@@ -21,10 +21,9 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const usersRes = await axios.get('http://localhost:3001/utilisateurs', config);
-      const tattoosRes = await axios.get('http://localhost:3001/tatouages', config);
-      const servicesRes = await axios.get('http://localhost:3001/services', config);
-
+    const usersRes = await axios.get('http://localhost:3001/api/utilisateurs', config);
+    const tattoosRes = await axios.get('http://localhost:3001/api/tatouages', config);
+    const servicesRes = await axios.get('http://localhost:3001/api/services', config);
       setUsers(usersRes.data);
       setTattoos(tattoosRes.data);
       setServices(servicesRes.data);

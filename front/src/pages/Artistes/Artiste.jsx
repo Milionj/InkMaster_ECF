@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Artistes.css';
 
 const Artistes = () => {
-  // États pour stocker les tatouages récupérés depuis la BDD
+  // États pour stocker les tatouages récupérés depuis la BDD pour chaque artiste
   const [tatouagesWebs, setTatouagesWebs] = useState([]);
   const [tatouagesJade, setTatouagesJade] = useState([]);
   const [tatouagesCrusher, setTatouagesCrusher] = useState([]);
@@ -14,26 +14,27 @@ const Artistes = () => {
 
   // useEffect pour charger les tatouages au montage du composant
   useEffect(() => {
-      // Webs => id 16....
-    // Récupérer les tatouages de Webs (id_utilisateur = 1)
-    fetch('http://localhost:3001/utilisateurs/16/tatouages')
+    // Récupérer les tatouages de Webs (id_utilisateur = 16)
+    fetch('http://localhost:3001/api/utilisateurs/16/tatouages')
       .then(res => res.json())
       .then(data => setTatouagesWebs(data));
 
-    // Récupérer les tatouages de Jade (id_utilisateur = 2)
-    fetch('http://localhost:3001/utilisateurs/17/tatouages')
+      
+
+    // Récupérer les tatouages de Jade (id_utilisateur = 17)
+    fetch('http://localhost:3001/api/utilisateurs/17/tatouages')
       .then(res => res.json())
       .then(data => setTatouagesJade(data));
 
-    // Récupérer les tatouages de Crusher (id_utilisateur = 3)
-    fetch('http://localhost:3001/utilisateurs/18/tatouages')
+    // Récupérer les tatouages de Crusher (id_utilisateur = 18)
+    fetch('http://localhost:3001/api/utilisateurs/18/tatouages')
       .then(res => res.json())
       .then(data => setTatouagesCrusher(data));
   }, []); // Le tableau vide signifie : exécuter ce code 1 fois au chargement
 
   // Fonction pour passer à l'image suivante dans le carrousel
   const next = (index, setIndex, gallery) => {
-    setIndex((index + 1) % gallery.length);
+    setIndex((index + 1) % gallery.length); // % pour boucler
   };
 
   // Fonction pour revenir à l'image précédente dans le carrousel
@@ -43,7 +44,7 @@ const Artistes = () => {
 
   // Composant réutilisable pour afficher un artiste avec son carrousel
   const ArtistGallery = ({ tatouages, index, setIndex, nom, description, photo }) => (
-    <div className="artist-block">
+    <div className="artist-block" key={nom}>
       <div className="artist-header">
         {/* Image de l’artiste (stockée dans public/images) */}
         <img src={photo} alt={nom} />
@@ -56,7 +57,7 @@ const Artistes = () => {
       </div>
           
       {/* Carrousel de tatouages */}
-       <div className="tattoo-carousel">
+      <div className="tattoo-carousel">
         <button
           className="carousel-arrow"
           onClick={() => prev(index, setIndex, tatouages)}
@@ -68,6 +69,7 @@ const Artistes = () => {
         <div className="tattoo-display">
           {tatouages.length > 0 ? (
             <>
+             {/* Affichage de l’image du tatouage avec chemin relatif vers le dossier public/images */}
               <img src={`/images/${tatouages[index].image}`} alt={tatouages[index].titre} />
               <h4>{tatouages[index].titre}</h4>
               <p>{tatouages[index].description}</p>

@@ -2,94 +2,95 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './GalleryCarousel.css';
 
-// CamelCase avec majuscule initiale (PascalCase) car c'est une fonction composant.**
+//  Composant GalleryCarousel : Carrousel d'affichage des tatouages
 const GalleryCarousel = () => {
-    // variable normal **
-    // nombre d'element a afficher défini
-    const itemsPerPage = 3;
 
-    // Hook React pour gerer la page actuellement affiché
-    const [page, setPage] = useState(1);
-    const [artworks, setArtworks] = useState([]);
+  // Nombre d’éléments à afficher par page (fixé à 3 ici)
+  const itemsPerPage = 3;
 
-    useEffect(() => {
-  const fetchTatouages = async () => {
-    try {
-      const res = await axios.get('http://localhost:3001/tatouages');
-      setArtworks(res.data);
-    } catch (err) {
-      console.error("Erreur lors du chargement des tatouages", err);
-    }
+  // Hooks React pour gérer les états
+  const [page, setPage] = useState(1);              // Page actuelle
+  const [artworks, setArtworks] = useState([]);     // Liste des tatouages
+
+  // useEffect : Se déclenche au chargement du composant (équivalent à componentDidMount)
+  useEffect(() => {
+    const fetchTatouages = async () => {
+      try {
+        // Requête vers le backend pour récupérer les tatouages
+const res = await axios.get('http://localhost:3001/api/tatouages/public', {
+  headers: { 'Accept': 'application/json' } // Aucune autorisation requise
+});
+
+
+
+        setArtworks(res.data); // Stocke les données dans artworks
+      } catch (err) {
+        console.error("Erreur lors du chargement des tatouages", err);
+      }
+    };
+
+    fetchTatouages();
+  }, []); // [] signifie que ça ne se déclenche qu'une seule fois
+
+  // Calcul du nombre total de pages avec Math.ceil pour arrondir au supérieur
+  const totalPages = Math.ceil(artworks.length / itemsPerPage);
+
+  // Calcul de l’index de départ pour la page actuelle
+  const startIndex = (page - 1) * itemsPerPage;
+
+  // Slice extrait les éléments correspondant à la page actuelle (pagination)
+  const currentItems = artworks.slice(startIndex, startIndex + itemsPerPage);
+
+  // Fonction pour aller à la page précédente (si ce n'est pas déjà la 1ère page)
+  const goToPrev = () => {
+    if (page > 1) setPage(page - 1);
   };
 
-  fetchTatouages();
-}, []);
+  // Fonction pour aller à la page suivante (si ce n'est pas déjà la dernière)
+  const goToNext = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
 
-
-    // Math.ceil() est une fonction JavaScript qui arrondit toujours un nombre à l'entier supérieur,
-    // même si la partie décimale est très petite.
-    // calculer le nombre de page a partir de la longueur du tableau
-    const totalPages = Math.ceil(artworks.length / itemsPerPage);
-
-    // calcule de l'index de départ de la page: actuelle
-    const startIndex = (page - 1) * itemsPerPage;
-
-    // On extrait les 3 éléments correspondant a la page actuelle 
-    // slice(avec deux arguments: startIndex, endIndex) est une méthode qui permet d’extraire une partie d’un tableau, sans le modifier.
-    const currentItems = artworks.slice(startIndex, startIndex + itemsPerPage);
-
-    // Fonction pour aller a la page précédente
-
-    const goToPrev = () => {
-        if (page > 1) setPage(page - 1);
-    };
-
-    // fonction pour aller a la page suivante
-    const goToNext = () => {
-        if (page < totalPages) setPage(page + 1);
-    };
-
-   return (
+  return (
     <section className="carousel-section">
-      {/* Affichage des œuvres en cours pour la page sélectionnée */}
+      {/* Cartes des tatouages pour la page en cours */}
       <div className="cards">
+{currentItems.map((art) => (
+  <article key={art.id_tatouage || `${art.titre}-${art.image}`}>
+    <figure>
+      <img src={`/images/${art.image}`} alt={art.titre} />
+    </figure>
+    <div className="article-preview">
+      <h2>{art.titre}</h2>
+      <p>{art.description}</p>
+      <p><strong>Artiste :</strong> {art.prenom_artiste} {art.nom_artiste}</p>
+    </div>
+  </article>
+))}
 
-        {/* .map() méthode JavaScript qui permet de transformer chaque élément d’un tableau en un nouveau tableau. */}
-        {currentItems.map((art, index) => (
-          <article key={index}>
-            <figure>
-              <img src={`/images/${art.image}`} alt={art.titre} />
-            </figure>
-            <div className="article-preview">
-            <h2>{art.titre}</h2>
-              <p>{art.description}</p>
-               <p><strong>Artiste :</strong> {art.prenom_artiste} {art.nom_artiste}</p>
-            </div>
-          </article>
-        ))}
       </div>
 
-      {/* Pagination (navigation) en dessous des cartes */}
-      <nav className="pagination_navigation" role="navigation" aria-label="Navigation de la galerie">
-        {/* Bouton page précédente (désactivé si page 1) */}
+      {/* Pagination : navigation entre les pages */}
+      <nav className="pagination_navigation" aria-label="Navigation de la galerie">
+        {/* Bouton précédent (désactivé si on est à la première page) */}
         <button onClick={goToPrev} className="pagination_button" disabled={page === 1}>
           ←
         </button>
 
-        {/* Sélecteur de page (menu déroulant) */}
+        {/* Sélecteur de page sous forme de menu déroulant */}
         <select
           value={page}
           onChange={(e) => setPage(Number(e.target.value))}
           aria-label="Choisir une page"
         >
           {Array.from({ length: totalPages }, (_, i) => (
-            <option key={i} value={i + 1}>
+            <option key={`page-${i + 1}`} value={i + 1}>
               Page {i + 1}
             </option>
           ))}
         </select>
 
-        {/* Bouton page suivante (désactivé si dernière page) */}
+        {/* Bouton suivant (désactivé si dernière page atteinte) */}
         <button onClick={goToNext} className="pagination_button" disabled={page === totalPages}>
           →
         </button>

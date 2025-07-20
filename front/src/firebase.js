@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 
-// Configuration Firebase (copiée depuis la console Firebase)
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -11,11 +10,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-
-// Initialisation de Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialisation Firestore
 const db = getFirestore(app);
 
-export { db, serverTimestamp };
+export { app, db, serverTimestamp };

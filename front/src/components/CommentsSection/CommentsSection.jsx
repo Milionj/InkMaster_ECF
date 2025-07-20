@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './CommentsSection.css';
 import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase"; //  `db` exporté dans le fichier firebase.js
+import { useAuth } from "../../Context/AuthContext";
+import axios from 'axios';
 
 const CommentsSection = () => {
   const [email, setEmail] = useState('');
@@ -9,29 +11,66 @@ const CommentsSection = () => {
   const [confirmation, setConfirmation] = useState('');
   const [rating, setRating] = useState(0);
   const [comments, setComments] = useState([]);
+  const { currentUser } = useAuth();
 
-  // Charger les commentaires validés depuis Firestore
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const q = query(
-          collection(db, "avis"),
-          where("approved", "==", true),
-          orderBy("createdAt", "desc")
-        );
+  // Fonction pour charger les commentaires approuvés
+ const fetchComments = async () => {
+  try {
+    const avisCollection = collection(db, "avis");
+    let q;
 
-        const querySnapshot = await getDocs(q);
-        const loadedComments = querySnapshot.docs.map(doc => doc.data());
-        setComments(loadedComments);
-      } catch (error) {
-        console.error("Erreur lors du chargement des commentaires :", error);
-      }
-    };
+    if (currentUser?.email === 'crusher@inkmaster.com') {
+      // Crusher voit tout (validés + non validés)
+      q = query(avisCollection, orderBy("createdAt", "desc"));
+    } else {
+      // Les visiteurs voient seulement les commentaires validés
+      q = query(avisCollection,
+        where("approved", "==", true),
+        orderBy("createdAt", "desc")
+      );
+    }
 
+    const querySnapshot = await getDocs(q);
+    const loadedComments = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    setComments(loadedComments);
+  } catch (error) {
+    console.error("Erreur lors du chargement des commentaires :", error);
+  }
+};
+
+
+  // Charger les commentaires au chargement
+useEffect(() => {
+  if (currentUser !== undefined) {
     fetchComments();
-  }, []);
+  }
+}, [currentUser]);
+;
 
-  // Envoi d'un commentaire dans Firestore
+  // Valider un commentaire (réservé à crusher@inkmaster.com)
+  const validateComment = async (commentId) => {
+    try {
+      const token = await currentUser.getIdToken();
+
+      await axios.patch(`http://localhost:5000/api/avis/${commentId}/validate`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      alert("Commentaire validé !");
+      fetchComments(); // Recharger les commentaires
+    } catch (error) {
+      console.error("Erreur de validation :", error);
+      alert("Erreur lors de la validation");
+    }
+  };
+
+  // Envoi d'un nouveau commentaire
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -61,7 +100,7 @@ const CommentsSection = () => {
 
       <div className="comments-container">
 
-        {/* Affichage des commentaires validés */}
+        {/* Liste des commentaires validés */}
         <div className="comments-list">
           {comments.map((comment, idx) => (
             <div key={idx} className="comment">
@@ -72,6 +111,12 @@ const CommentsSection = () => {
                   {"★".repeat(comment.rating)}{"☆".repeat(5 - comment.rating)}
                 </div>
               )}
+
+              {/* Bouton de validation pour crusher@inkmaster.com */}
+              {currentUser?.email === 'crusher@inkmaster.com' && !comment.approved && (
+              <button onClick={() => validateComment(comment.id)}>Valider</button>
+            )}
+
             </div>
           ))}
         </div>

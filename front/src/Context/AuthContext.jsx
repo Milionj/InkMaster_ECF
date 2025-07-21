@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app } from "../firebase"; // ton fichier firebase.js doit exporter app
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { app } from "../firebase";
 
 const AuthContext = createContext();
 
@@ -15,17 +15,31 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    return unsubscribe; // Nettoyage
+    return unsubscribe;
   }, []);
 
+  // 🔑 Fonction de login Firebase (pour Firestore)
+  const login = async (email, password) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error("Erreur lors du login Firebase :", error);
+      throw error;
+    }
+  };
+
+  // 🔓 Déconnexion
+  const logout = async () => {
+    await signOut(auth);
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, loading }}>
+    <AuthContext.Provider value={{ currentUser, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook personnalisé pour utiliser AuthContext
 export const useAuth = () => {
   return useContext(AuthContext);
 };

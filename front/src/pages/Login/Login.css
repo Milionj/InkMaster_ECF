@@ -1,12 +1,12 @@
-.login-page {
-  background: #ffff;
+.contact-page {
+  background: #fff;
   min-height: 100vh;
   padding: 100px 40px;
   font-family: 'Arial', sans-serif;
-  font-size: 1.5rem; /* Texte global plus grand */
+  font-size: 1.5rem;
 }
 
-.login-box {
+.contact-form {
   background: #f2f2f2;
   max-width: 600px;
   margin: 0 auto;
@@ -16,14 +16,15 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
-.login-box label {
+.contact-form label {
   display: block;
   font-weight: bold;
   margin-top: 25px;
   font-size: 1.3rem;
-    }
+}
 
-.login-box input {
+.contact-form input,
+.contact-form textarea {
   width: 100%;
   padding: 20px;
   margin-top: 10px;
@@ -33,7 +34,12 @@
   border-radius: 8px;
 }
 
-.login-box button {
+.contact-form textarea {
+  resize: vertical; /* Permet à l'utilisateur d'agrandir verticalement */
+  min-height: 120px;
+}
+
+.contact-form button {
   width: 100%;
   background-color: #35598f;
   color: white;
@@ -46,8 +52,14 @@
   transition: background-color 0.3s ease;
 }
 
-.login-box button:hover {
-  background-color:#5F6982;
+.contact-form button:hover {
+  background-color: #5F6982;
+}
+
+.success-msg {
+  color: green;
+  margin-top: 20px;
+  font-size: 1.2rem;
 }
 
 .error-msg {

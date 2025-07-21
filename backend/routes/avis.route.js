@@ -40,24 +40,5 @@ router.get('/avis', async (req, res) => {
   }
 });
 
-// Valider un avis (réservé à crusher@inkmaster.com)
-router.patch('/avis/:id/validate', verifyToken, async (req, res) => {
-  try {
-    const user = req.user;
-
-    if (user.email !== 'crusher@inkmaster.com') {
-      return res.status(403).json({ message: 'Accès refusé.' });
-    }
-
-    const avisRef = doc(db, 'avis', req.params.id);
-    await updateDoc(avisRef, { approved: true });
-
-    res.status(200).json({ message: 'Avis validé avec succès.' });
-  } catch (error) {
-    console.error('Erreur validation :', error);
-    res.status(500).json({ message: 'Erreur serveur.' });
-  }
-});
-
 
 export default router;

@@ -6,8 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "/wait-for-it.sh db:3306 --timeout=30 --strict -- node index.js"
-
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",

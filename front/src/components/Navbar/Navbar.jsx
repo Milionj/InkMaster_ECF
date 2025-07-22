@@ -36,6 +36,7 @@ function Navbar() {
 
         {/* Icône menu burger (visible uniquement sur mobile) */}
         <div className="burger" onClick={toggleBurger}>
+          {/* rotate = effet croix */}
           <div className={`line ${isOpen ? 'rotate1' : ''}`}></div>
           <div className={`line ${isOpen ? 'fade' : ''}`}></div>
           <div className={`line ${isOpen ? 'rotate2' : ''}`}></div>

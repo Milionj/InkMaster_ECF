@@ -36,11 +36,13 @@ const Services = () => {
           </p>
         </div>
       </div>
-      <div className="care-section">
-  <h2>Prenez soins de vous</h2>
-  <div className="care-content">
-    <img src="/images/Soins.webp" alt="Soins" />
-    <div>
+<div className="care-section">
+  <h2>Prenez soin de vous</h2>
+
+  <div className="care-layout">
+    <img src="/images/Soins.webp" alt="Soins" className="care-image" />
+
+    <div className="care-text">
       <h3>Votre attention !</h3>
       <p>
         Chez InkMaster, nous comprenons que certains tatouages ne correspondent plus à votre histoire.
@@ -53,8 +55,13 @@ const Services = () => {
     </div>
   </div>
 </div>
+
+
+
     </div>
   );
 };
 
 export default Services;
+
+    

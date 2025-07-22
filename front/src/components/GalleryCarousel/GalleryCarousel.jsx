@@ -56,16 +56,20 @@ const res = await axios.get('http://localhost:5000/api/tatouages/public', {
       {/* Cartes des tatouages pour la page en cours */}
       <div className="cards">
 {currentItems.map((art) => (
-  <article key={art.id_tatouage || `${art.titre}-${art.image}`}>
-    <figure>
-      <img src={`/images/${art.image}`} alt={art.titre} />
-    </figure>
-    <div className="article-preview">
-      <h2>{art.titre}</h2>
-      <p>{art.description}</p>
-      <p><strong>Artiste :</strong> {art.prenom_artiste} {art.nom_artiste}</p>
-    </div>
-  </article>
+<article key={art.id_tatouage || `${art.titre}-${art.image}`}>
+  <div className="image-wrapper">
+    <img src={`/images/${art.image}`} alt={art.titre} />
+  </div>
+  <div className="article-preview">
+    <h2>{art.titre}</h2>
+    <p>{art.description}</p>
+    <p><strong>Artiste :</strong> {art.prenom_artiste} {art.nom_artiste}</p>
+  </div>
+</article>
+
+
+
+
 ))}
 
       </div>

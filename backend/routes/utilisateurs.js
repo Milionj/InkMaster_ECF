@@ -6,12 +6,14 @@ import { verifyToken, isAdmin } from '../middleware/verifyToken.js';
 import fetch from 'node-fetch';
 
 const router = express.Router();
+// reCAPTCHA
+// Si Google renvoie success: true, la connexion continue. 
+// Sinon, le backend retourne une erreur : "Captcha invalide".
 
-// Fonction pour vérifier le captcha avec Google reCAPTCHA
 const verifyCaptcha = async (token) => {
-  const response = await fetch(
+  const response = await fetch( // fetch pour recuperer le infos du serveur
     `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${token}`,
-    { method: 'POST' }
+    { method: 'POST' } // requet http axios (get, post..)
   );
   const data = await response.json();
   return data.success;
@@ -22,9 +24,11 @@ router.post('/login', async (req, res) => {
   const { email, password, captchaToken } = req.body;
 
   try {
+    // 1 - Vérification du Captcha
     const captchaValid = await verifyCaptcha(captchaToken);
     if (!captchaValid) return res.status(400).json({ message: 'Captcha invalide' });
-
+    
+    // 2 - Recherche de l'utilisateur dans MySQL
     const [rows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);
     if (rows.length === 0) return res.status(401).json({ message: 'Utilisateur introuvable' });
 
@@ -32,8 +36,9 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, utilisateur.mdp);
     if (!valid) return res.status(401).json({ message: 'Mot de passe incorrect' });
 
+
     const token = jwt.sign(
-      { id: utilisateur.id_utilisateur, role: utilisateur.role },
+      { id: utilisateur.id_utilisateur, role: utilisateur.role },  //  Le rôle est encodé ici 
       process.env.JWT_SECRET || 'inkmasterSecretKey',
       { expiresIn: '2h' }
     );
@@ -48,7 +53,7 @@ router.post('/login', async (req, res) => {
 // ------------------ CRUD UTILISATEURS ------------------
 
 // GET - Liste de tous les utilisateurs (Admin uniquement)
-// Route : GET /api/utilisateurs
+// Route : GET utilisateurs
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const [rows] = await db.execute(

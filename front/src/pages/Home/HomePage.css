@@ -1,129 +1,167 @@
-/* presentation du site */
-.home-container {
-  font-family: 'Squada One', sans-serif;
-  max-width: 1200px;
-  padding-top: 80px;
-  margin: 0 auto;
+/* Général */
+body {
+    background-color: #E5E5E5;
+    margin: 0;
+    padding: 0;
+    font-family: 'Squada One', sans-serif;
+    color: #222;
 }
 
-body {
+.home-container {
+    font-family: 'Squada One', sans-serif;
+    width: 100%;
+    padding: 80px 40px 0 40px;
+    box-sizing: border-box;
+}
+
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    padding: 60px 20px;
     background-color: #E5E5E5;
 }
 
-
-.hero-section {
-  text-align: center;
-  padding: 40px 20px;
-  background-color: #E5E5E5;
-    min-height: 100vh;
-}
-
 .hero-section h1 {
-  font-size: 2.7rem;
-  margin-bottom: 1rem;
+    font-size: 3rem;
+    margin-bottom: 1rem;
 }
 
 .hero-section p {
-  font-size: 1.2rem;
-  color: black;
-  max-width: 600px;
-  margin: 0 auto 20px;
+    font-size: 1.2rem;
+    color: #333;
+    max-width: 700px;
+    margin: 0 auto 20px;
 }
 
-.hero-image {
-  width: 100%;
-  max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+.hero-section img {
+    width: 100%;
+    max-width: 1600px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    margin-top: 20px;
 }
 
+
+/* Presentation Section */
 .presentation-section {
-  text-align: center;
-  padding: 60px 20px;
-  background-color: #ffffff;
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #ffffff;
 }
 
 .presentation-section h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
 }
 
 .presentation-section p {
-  max-width: 600px;
-  margin: 0 auto 40px;
-  color: black;
-  font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    color: #444;
+    font-size: 1.2rem;
 }
-/* carousset composant *
-.../
 
+/* GalleryCarousel : ajouter si besoin */
 
-/* Localisation salon */
+.gallery-carousel img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+    margin: 0 10px;
+}
 
+/* Location Section */
 .location-section {
-  background-color: #e6e6e6;
-  padding: 3rem 1rem;
-  font-family: 'Squada One', sans-serif;
-  align-items:  center;
-  text-align: center;
+    background-color: #f2f2f2;
+    padding: 60px 20px;
+    text-align: center;
 }
 
 .location-section h2 {
-  font-size: 2.7rem;
-  margin-bottom: 2rem;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .location-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  /* gap: 1rem; */
-  flex-wrap: wrap; /* pour que ça passe en colonne sur petits écrans */
-  text-align: left; /* contenu aligné à gauche */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.location-map-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
+.location-map-container,
+.location-info {
+    flex: 0 1 500px; /* Même largeur que la carte (500px) */
+    min-width: 300px;
+    max-width: 500px; /* Limite haute pour garder cohérence */
 }
-
-/* .location-map {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 8px;
-  border: 1px solid #999;
-} */
 
 .location-map {
-  width: 100%;
-  max-width: 500px;
-  height: 400px;
-  border-radius: 10px;
-  border: 2px solid #555;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: 400px;
+    border-radius: 10px;
+    border: 2px solid #555;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-
 
 .location-info {
-  flex: 1;
-  max-width: 400px;
-  background-color: white;
-  border: 1px solid black;
-  padding: 1.5rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+    background-color: white;
+    border: 1px solid black;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    height: 400px; /* Même hauteur que la carte */
+    box-sizing: border-box;
 }
 
+
 .info {
-  font-size : 1.3rem
+    font-size: 1.3rem;
 }
 
 .location-info h3 {
-  font-size: 1.2rem;
-  margin: 0.5rem 0;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+
+/* Comments Section */
+.comments-section {
+    margin: 60px 20px;
+    background-color: #fff;
+    padding: 40px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Footer */
+.footer {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    padding: 20px 10px;
+    font-size: 0.9rem;
+    margin-top: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .location-content {
+        flex-direction: column;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .presentation-section h2,
+    .location-section h2 {
+        font-size: 2rem;
+    }
 }

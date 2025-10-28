@@ -5,37 +5,43 @@ import ReCAPTCHA from "react-google-recaptcha";
 import './Login.css';
 
 export default function Login() {
-    // États pour les champs de formulaire
+    // États pour stocker les champs du formulaire
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [captchaToken, setCaptchaToken] = useState('');
 
-    // États pour les messages d'erreur
+    // États pour les messages d’erreur
     const [erreur, setErreur] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
-    const recaptchaRef = useRef(null); // Permet de reset le captcha après soumission
+    // Ref pour pouvoir reset le reCAPTCHA après soumission
+    const recaptchaRef = useRef(null);
     const navigate = useNavigate();
 
-    // Vérifie que l'email est bien au bon format
+    // Fonction pour vérifier que l’email est valide
     const validateEmail = (email) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
     };
 
-    
-
-    // Vérifie que le mot de passe contient au moins 6 caractères avec lettres et chiffres
+    // Fonction pour vérifier que le mot de passe est valide (lettres + chiffres, au moins 6 caractères)
     const validatePassword = (password) => {
         const regex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
         return regex.test(password);
     };
 
+    // Fonction déclenchée lors de la soumission du formulaire
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // Vérification du format email
+        // Si le reCAPTCHA n’a pas été validé, on empêche l’envoi
+        if (!captchaToken) {
+            setErreur("Veuillez valider le reCAPTCHA.");
+            return;
+        }
+
+        // Vérification du format de l’email
         if (!validateEmail(email)) {
             setEmailError("Format d'email invalide.");
             return;
@@ -43,7 +49,7 @@ export default function Login() {
             setEmailError('');
         }
 
-        // Vérification du format mot de passe
+        // Vérification du format du mot de passe
         if (!validatePassword(password)) {
             setPasswordError("Mot de passe invalide : au moins 6 caractères avec lettres et chiffres");
             return;
@@ -51,37 +57,45 @@ export default function Login() {
             setPasswordError('');
         }
 
+        // Affiche le token reCAPTCHA dans la console pour le debug
+        console.log("Token captcha envoyé au backend :", captchaToken);
+
         try {
-            // Envoie des données au backend : email, mdp et token captcha
+            // Envoie des données de connexion + token captcha au backend
             const res = await axios.post('http://localhost:5000/api/utilisateurs/login', { 
                 email,
                 password,
                 captchaToken
             });
 
+            // Si la connexion réussit, on stocke le token JWT et le rôle dans le localStorage
             const { token, role } = res.data;
-
-            // Stocke le token JWT et le rôle en local
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
 
-            // Redirection en fonction du rôle
+            // Redirection selon le rôle
             if (role === 'admin') {
                 navigate('/dashboard');
             } else if (role === 'artiste') {
-                navigate('/'); // Redirection vers la page publique pour les artistes
+                navigate('/');
             } else {
                 setErreur("Rôle inconnu.");
             }
 
         } catch (err) {
             console.error(err);
-            setErreur("Email ou mot de passe incorrect.");
+            // Si c’est une erreur liée au captcha, on affiche un message spécifique
+            if (err.response?.data?.message === "Captcha invalide") {
+                setErreur("Captcha invalide. Merci de cocher à nouveau.");
+            } else {
+                setErreur("Email ou mot de passe incorrect.");
+            }
         }
 
-        // Réinitialise le captcha après tentative
+        // On reset le reCAPTCHA pour permettre une nouvelle tentative
         if (recaptchaRef.current) {
             recaptchaRef.current.reset();
+            setCaptchaToken(''); // On remet l’état à vide
         }
     };
 
@@ -95,15 +109,7 @@ export default function Login() {
                     type="email"
                     placeholder="email valide"
                     value={email}
-                    onChange={(e) => { 
-                        const val = e.target.value; 
-                        setEmail(val);
-                        if (!validateEmail(val)) {
-                            setEmailError("Format d'email invalide.");
-                        } else {
-                            setEmailError('');
-                        }
-                    }}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                 />
                 {emailError && <p className="error-msg">{emailError}</p>}
@@ -113,30 +119,24 @@ export default function Login() {
                     type="password"
                     placeholder="mot de passe"
                     value={password}
-                    onChange={(e) => { 
-                        const val = e.target.value;
-                        setPassword(val);
-                        if (!validatePassword(val)) {
-                            setPasswordError("Mot de passe : au moins 6 caractères avec lettres et chiffres");
-                        } else {
-                            setPasswordError('');
-                        }
-                    }}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                 />
                 {passwordError && <p className="error-msg">{passwordError}</p>}
 
-                {/* Lors du clic sur "Connexion", le reCAPTCHA génère un token temporaire.
-                    Ce token est envoyé avec l'email et le mot de passe dans la requête vers le backend.
-                    Le backend valide ce token grâce à l'API Google reCAPTCHA côté serveur. */}
+                {/* Composant reCAPTCHA : on récupère le token dès que l’utilisateur coche la case */}
                 <ReCAPTCHA
-                    sitekey="6LeKCXUrAAAAAJhnN1D87kWMfZ0wlLD_J7uujRmm"
-                    onChange={(token) => setCaptchaToken(token)}
+                    sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
+                    onChange={(token) => {
+                        console.log("Token reCAPTCHA reçu :", token);
+                        setCaptchaToken(token);
+                    }}
                     ref={recaptchaRef}
                 />
 
                 <button type="submit">Connexion</button>
 
+                {/* Affichage d’un message d’erreur global si besoin */}
                 {erreur && <p className="error-msg">{erreur}</p>}
             </form>
         </div>

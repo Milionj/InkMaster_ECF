@@ -1,52 +1,55 @@
+version: "3.8"
+
 services:
+
+  # BACKEND - API Express
   backend:
-    build: ./backend              # Construit l'image à partir du dossier backend/
+    build: ./backend                      # Construit l'image depuis le dossier backend/
     ports:
-      - "5000:5000"               # Rend l'API accessible sur http://localhost:5000
-    environment:
-      - DB_HOST=db               # Adresse du service MySQL (correspond au nom du conteneur "db")
-      - DB_USER=root             # Nom d'utilisateur MySQL
-      - DB_PASSWORD=root         # Mot de passe MySQL
-      - DB_NAME=inkmaster_db     # Nom de la base de données utilisée
-      - JWT_SECRET=inkmasterSecret          # Clé secrète pour les tokens JWT
-      - RECAPTCHA_SECRET=...                # Clé secrète pour reCAPTCHA côté backend
+      - "5000:5000"                       # Rend l'API accessible sur http://localhost:5000
+    env_file:
+      - ./backend/.env                   # Charge les variables d'environnement (BDD, JWT, reCAPTCHA)
     depends_on:
       db:
-        condition: service_healthy          # Ne démarre ce service que quand la base est prête
-    restart: always                         # Redémarre automatiquement en cas de crash
+        condition: service_healthy       # Attend que la BDD MySQL soit prête avant de démarrer
+    restart: always                      # Redémarre en cas de crash
 
+  # BASE DE DONNÉES - MySQL
   db:
-    image: mysql:8.0                        # Utilise l'image officielle MySQL version 8
+    image: mysql:8.0                     # Image officielle MySQL
     environment:
-      MYSQL_ROOT_PASSWORD: root            # Mot de passe pour le compte root
-      MYSQL_DATABASE: inkmaster_db         # Crée automatiquement cette base au démarrage
+      MYSQL_ROOT_PASSWORD: root         # Mot de passe root
+      MYSQL_DATABASE: inkmaster_db      # Crée cette base au démarrage
     ports:
-      - "3307:3306"                         # Accès à MySQL en local via le port 3307
+      - "3307:3306"                      # Redirige le port local 3307 vers le port MySQL interne 3306
     volumes:
-      - db_data:/var/lib/mysql             # Stocke les données MySQL sur le disque (persistant)
+      - db_data:/var/lib/mysql          # Stockage persistant des données
     restart: always
-    healthcheck:                            # Vérifie que MySQL est prêt à répondre avant de démarrer d'autres services
+    healthcheck:                        # Vérifie si la base est opérationnelle
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  # INTERFACE PHPMyAdmin
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin           # Image officielle de phpMyAdmin
+    image: phpmyadmin/phpmyadmin        # Interface graphique pour gérer MySQL
     ports:
-      - "8080:80"                           # Accessible depuis le navigateur sur http://localhost:8080
+      - "8080:80"                        # Accessible sur http://localhost:8080
     environment:
-      - PMA_HOST=db                        # Connexion directe à la base de données "db"
-      - MYSQL_ROOT_PASSWORD=root
+      - PMA_HOST=db                     # Nom du service MySQL à utiliser (doit matcher `db`)
+      - MYSQL_ROOT_PASSWORD=root        # Mot de passe root MySQL
     restart: always
 
+  # FRONTEND - React/Vite
   frontend:
-    build: ./front                         # Construit l'image depuis le dossier front/
+    build: ./front                      # Construit l'image depuis le dossier front/
     ports:
-      - "5173:80"                           # Le site sera visible sur http://localhost:5173
+      - "5173:80"                        # Frontend disponible sur http://localhost:5173
     depends_on:
-      - backend                            # Attend que le backend soit prêt
+      - backend                         # Démarre après le backend
     restart: always
 
+# VOLUMES PERSISTANTS
 volumes:
-  db_data:     # Volume nommé pour sauvegarder les données MySQL entre les démarrages
+  db_data:                              # Conserve les données de MySQL entre les redémarrages

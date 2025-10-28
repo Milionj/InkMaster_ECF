@@ -2,9 +2,11 @@ import { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from "react-google-recaptcha";
+import { useUser } from '../../context/UserContext'; // Chemin à ajuster si besoin
 import './Login.css';
 
 export default function Login() {
+      const { login } = useUser();
     // États pour stocker les champs du formulaire
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -70,8 +72,7 @@ export default function Login() {
 
             // Si la connexion réussit, on stocke le token JWT et le rôle dans le localStorage
             const { token, role } = res.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('role', role);
+            login(token, role);
 
             // Redirection selon le rôle
             if (role === 'admin') {

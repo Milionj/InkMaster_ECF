@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useUser } from '../context/UserContext'; // Récupère l'état global de l'utilisateur
+import { useUser } from '../../context/UserContext';
+
 import './Navbar.css';
 
 function Navbar() {

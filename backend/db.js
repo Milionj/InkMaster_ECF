@@ -1,8 +1,9 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
-dotenv.config();
-
+// dotenv.config();
+//dev local
+dotenv.config({ path: '.env.local' });
 async function connectWithRetry(retries = 5, delay = 2000) {
   while (retries) {
     try {

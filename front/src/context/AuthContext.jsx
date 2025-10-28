@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 🔓 Déconnexion
+  //  Déconnexion
   const logout = async () => {
     await signOut(auth);
   };

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import './Navbar.css';
 
@@ -12,6 +14,13 @@ function Navbar() {
   const toggleBurger = () => {
     setIsOpen(!isOpen);
   };
+
+  const location = useLocation();
+
+useEffect(() => {
+  setIsOpen(false); // ferme le menu burger à chaque changement de route
+}, [location]);
+
 
   return (
     <>
@@ -49,6 +58,10 @@ function Navbar() {
               {role === 'artiste' && (
                 <Link to="/mes-tatouages" onClick={toggleBurger}>Mes tatouages</Link>
               )}
+              {role === 'artiste' && (
+              <Link to="/moderation" onClick={toggleBurger}>Modérer les avis</Link>
+              )}
+
 
               {/* Bouton de déconnexion */}
               <button className="logout-btn" onClick={() => { logout(); toggleBurger(); }}>

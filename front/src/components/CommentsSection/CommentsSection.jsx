@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './CommentsSection.css';
-import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from "firebase/firestore";
-import { db } from "../../firebase";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp
+} from 'firebase/firestore';
+import { db } from '../../firebase';
 
 const CommentsSection = () => {
   const [email, setEmail] = useState('');
@@ -10,51 +17,43 @@ const CommentsSection = () => {
   const [confirmation, setConfirmation] = useState('');
   const [comments, setComments] = useState([]);
 
-  // Charger uniquement les commentaires validés (approved === true)
+  // Écouter en temps réel les commentaires depuis Firestore
   useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const avisCollection = collection(db, "avis");
-        const q = query(
-          avisCollection,
-          where("approved", "==", true),
-          orderBy("createdAt", "desc")
-        );
+    const q = query(collection(db, 'avis'), orderBy('createdAt', 'desc'));
 
-        const querySnapshot = await getDocs(q);
-        const loadedComments = querySnapshot.docs.map(doc => ({
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const loadedComments = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
           id: doc.id,
-          ...doc.data()
-        }));
+          ...data,
+          createdAt: data.createdAt?.toDate() ?? null,
+        };
+      });
+      setComments(loadedComments);
+    });
 
-        setComments(loadedComments);
-      } catch (error) {
-        console.error("Erreur lors du chargement des commentaires :", error);
-      }
-    };
-
-    fetchComments();
+    return () => unsubscribe();
   }, []);
 
-  // Envoyer un nouveau commentaire (toujours avec approved: false)
+  // Soumettre un nouvel avis
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await addDoc(collection(db, "avis"), {
+      await addDoc(collection(db, 'avis'), {
         email,
         message,
         rating,
-        approved: false, // restera invisible jusqu'à validation côté Firestore si tu veux en ajouter plus tard
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
-      setConfirmation("Merci pour votre commentaire ! Il sera visible après validation.");
+      setConfirmation('Merci pour votre commentaire !');
       setEmail('');
       setMessage('');
       setRating(0);
 
-      setTimeout(() => setConfirmation(''), 5000);
+      setTimeout(() => setConfirmation(''), 4000);
     } catch (error) {
       console.error("Erreur lors de l'envoi du commentaire :", error);
     }
@@ -66,7 +65,7 @@ const CommentsSection = () => {
 
       <div className="comments-container">
         <div className="comments-list">
-          {comments.map(comment => (
+          {comments.map((comment) => (
             <div key={comment.id} className="comment">
               <strong>{comment.email}</strong>
               <p>{comment.message}</p>

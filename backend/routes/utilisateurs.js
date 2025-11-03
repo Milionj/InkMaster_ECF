@@ -11,11 +11,17 @@ const router = express.Router();
 // Sinon, le backend retourne une erreur : "Captcha invalide".
 
 const verifyCaptcha = async (token) => {
-  const response = await fetch( // fetch pour recuperer le infos du serveur
+  const response = await fetch(
     `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${token}`,
-    { method: 'POST' } // requet http axios (get, post..)
+    { method: 'POST' }
   );
   const data = await response.json();
+
+  console.log("---- CAPTCHA DEBUG ----");
+  console.log("Token reçu :", token);
+  console.log("Clé secrète utilisée :", process.env.RECAPTCHA_SECRET);
+  console.log("Réponse de Google :", data);
+  console.log("------------------------");
   return data.success;
 };
 
@@ -26,7 +32,7 @@ router.post('/login', async (req, res) => {
   try {
     // 1 - Vérification du Captcha
     const captchaValid = await verifyCaptcha(captchaToken);
-    if (!captchaValid) return res.status(400).json({ message: 'Captcha invalide' });
+    if (!captchaValid) return res.status(400).json({ message: 'Captcha invalide'});
     
     // 2 - Recherche de l'utilisateur dans MySQL
     const [rows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);

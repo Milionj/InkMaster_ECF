@@ -2,17 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './GalleryCarousel.css';
 
-//  Composant GalleryCarousel : Carrousel d'affichage des tatouages
 const GalleryCarousel = () => {
 
-  // Nombre d’éléments à afficher par page (fixé à 3 ici)
+  // Nombre d’éléments à afficher par page (fixé à 3)
   const itemsPerPage = 3;
 
   // Hooks React pour gérer les états
   const [page, setPage] = useState(1);              // Page actuelle
   const [artworks, setArtworks] = useState([]);     // Liste des tatouages
 
-  // useEffect : Se déclenche au chargement du composant (équivalent à componentDidMount)
+  // useEffect : qui se déclenche au chargement du composant 
   useEffect(() => {
     const fetchTatouages = async () => {
       try {

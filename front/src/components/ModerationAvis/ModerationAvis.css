@@ -1,0 +1,60 @@
+.moderation-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fafafa;
+  border-radius: 10px;
+}
+
+.comment-card {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+}
+
+.stars {
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+  color: gold;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.actions button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  background-color: #000000; /* Noir */
+  color: #ffffff;            /* Texte blanc */
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.actions button:hover {
+  background-color: #340873; /* Violet foncé InkMaster */
+}
+
+.message {
+  color: green;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.new-comment {
+  border: 2px solid #63E0BE;
+  background-color: #f0fff8;
+  animation: flash 1s ease-in-out;
+}
+
+@keyframes flash {
+  0% { background-color: #fff; }
+  50% { background-color: #63E0BE22; }
+  100% { background-color: #f0fff8; }
+}

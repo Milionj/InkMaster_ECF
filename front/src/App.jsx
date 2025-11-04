@@ -9,7 +9,7 @@ import {
 // Import des composants communs du site
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
-
+import './App.css';
 // Import des pages publiques
 import HomePage from "./pages/Home/HomePage";
 import Artistes from "./pages/Artistes/Artiste";
@@ -28,6 +28,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Import de la logique qui gère l'accès à la modération des avis (artiste uniquement)
 import ModerationGate from "./components/ModerationAvis/ModerationGate"; // composant sécurisé
+import RendezVousForm from "./components/RendezVousForm/RendezVousForm";
 
 export default function App() {
   return (
@@ -53,7 +54,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/services" element={<Services />} />
-
+        <Route path="/rendez-vous" element={<RendezVousForm/>} />
         {/* Les utilisateurs gerent leurs tatouagees */}
         <Route
           path="/mes-tatouages"

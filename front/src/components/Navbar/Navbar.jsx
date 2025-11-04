@@ -42,7 +42,7 @@ useEffect(() => {
           <Link to="/services" onClick={toggleBurger}>Services</Link>
           <Link to="/artistes" onClick={toggleBurger}>Artistes</Link>
           <Link to="/contact" onClick={toggleBurger}>Contact</Link>
-
+          <Link to="/rendez-vous" onClick={toggleBurger}>prendre <strong>rendez-vous</strong></Link>
           {/* Si connecté */}
           {token ? (
             <>

@@ -78,9 +78,12 @@ export default function Login() {
 
       // Si la connexion réussit, on stocke le token JWT et le rôle dans le localStorage
       const { token, role } = res.data;
+
+      // a verifier
+      // ------------------------------------------------------------------------------------------------
       // Connexion à Firebase Auth en parallèle du backend
-      const firebaseAuth = getAuth();
-      await signInWithEmailAndPassword(firebaseAuth, email, password);
+      // const firebaseAuth = getAuth();
+      // await signInWithEmailAndPassword(firebaseAuth, email, password);
 
       login(token, role);
 

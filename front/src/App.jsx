@@ -12,6 +12,7 @@ import Footer from "./components/Footer/Footer";
 import './App.css';
 // Import des pages publiques
 import HomePage from "./pages/Home/HomePage";
+import Confidentialite from "./pages/Confidentialite/Confidentialite";
 import Artistes from "./pages/Artistes/Artiste";
 import Contact from "./pages/Contact/Contact";
 import Login from "./pages/Login/Login";
@@ -55,6 +56,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/services" element={<Services />} />
         <Route path="/rendez-vous" element={<RendezVousForm/>} />
+        <Route path="/confidentialite" element={<Confidentialite />} />
         {/* Les utilisateurs gerent leurs tatouagees */}
         <Route
           path="/mes-tatouages"

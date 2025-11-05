@@ -43,52 +43,61 @@ const Artistes = () => {
   };
 
   // Composant réutilisable pour afficher un artiste avec son carrousel
-  const ArtistGallery = ({ tatouages, index, setIndex, nom, description, photo }) => (
-    <div className="artist-block" key={nom}>
-      <div className="artist-header">
-        {/* Image de l’artiste (stockée dans public/images) */}
-        <img src={photo} alt={nom} />
-        <div className="artist-desc">
-          <h3>{nom}</h3>
-          <p>{description}</p>
-          <span>InkMaster</span><br />
-          <span>{nom}</span>
-        </div>
+ // Composant réutilisable pour afficher un artiste avec son carrousel
+const ArtistGallery = ({ tatouages, index, setIndex, nom, description, photo }) => (
+  <div className="artist-block" key={nom}>
+    <div className="artist-header">
+      {/* Media à gauche */}
+      <div className="artist-media">
+        <img src={photo} alt={nom} className="artist-photo" />
       </div>
-          
-      {/* Carrousel de tatouages */}
-      <div className="tattoo-carousel">
-        <button
-          className="carousel-arrow"
-          onClick={() => prev(index, setIndex, tatouages)}
-          disabled={tatouages.length === 0}
-        >
-          ←
-        </button>
 
-        <div className="tattoo-display">
-          {tatouages.length > 0 ? (
-            <>
-             {/* Affichage de l’image du tatouage avec chemin relatif vers le dossier public/images */}
-              <img src={`/images/${tatouages[index].image}`} alt={tatouages[index].titre} />
-              <h4>{tatouages[index].titre}</h4>
-              <p>{tatouages[index].description}</p>
-            </>
-          ) : (
-            <p>Aucun tatouage disponible pour cet artiste.</p>
-          )}
-        </div>
-
-        <button
-          className="carousel-arrow"
-          onClick={() => next(index, setIndex, tatouages)}
-          disabled={tatouages.length === 0}
-        >
-          →
-        </button>
+      {/* Texte à droite */}
+      <div className="artist-desc">
+        <h3>{nom}</h3>
+        <p>{description}</p>
+        <span>InkMaster</span><br />
+        <span>{nom}</span>
       </div>
     </div>
-  );
+
+    {/* Carrousel de tatouages */}
+    <div className="tattoo-carousel">
+      <button
+        className="carousel-arrow"
+        type="button"
+        aria-label="Tatouage précédent"
+        onClick={() => prev(index, setIndex, tatouages)}
+        disabled={tatouages.length === 0}
+      >
+        ←
+      </button>
+
+      <div className="tattoo-display">
+        {tatouages.length > 0 ? (
+          <>
+            <img src={`/images/${tatouages[index].image}`} alt={tatouages[index].titre} />
+            <h4>{tatouages[index].titre}</h4>
+            <p>{tatouages[index].description}</p>
+          </>
+        ) : (
+          <p>Aucun tatouage disponible pour cet artiste.</p>
+        )}
+      </div>
+
+      <button
+        className="carousel-arrow"
+        type="button"
+        aria-label="Tatouage suivant"
+        onClick={() => next(index, setIndex, tatouages)}
+        disabled={tatouages.length === 0}
+      >
+        →
+      </button>
+    </div>
+  </div>
+);
+
 
   return (
     <div className="artist-container">
@@ -108,7 +117,7 @@ const Artistes = () => {
         index={indexJade}
         setIndex={setIndexJade}
         nom="Jade"
-        description="Street dans l’âme, feu dans les veines : Jade tatoue comme elle respire – brut, vrai, sans censure."
+        description="Jade tatoueuse inspiré. Brut, vrai, sans censure."
         photo="/images/Artiste3.jpg"
       />
 

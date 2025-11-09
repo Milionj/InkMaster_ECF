@@ -1,14 +1,14 @@
-import createDOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
-const window = new JSDOM("").window;
+const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
-// Aucune balise autorisée par défaut (texte brut)
+// Par dÃ©faut: aucune balise/attribut autorisÃ©s (texte brut)
 const defaultCfg = { ALLOWED_TAGS: [], ALLOWED_ATTR: [] };
 
 export const cleanString = (val, cfg = defaultCfg) => {
-  if (typeof val !== "string") return val;
+  if (typeof val !== 'string') return val;
   return DOMPurify.sanitize(val, cfg).trim();
 };
 

@@ -5,7 +5,15 @@ export const createUserValidator = [
   body('prenom').isString().isLength({ min: 1, max: 120 }),
   body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 8, max: 128 }),
-  body('role').isIn(['admin','artiste','employe']).withMessage('Rôle invalide'),
+  body('role').isIn(['admin','artiste','employe']),
 ];
 
-export const userIdParam = [ param('id').isInt().withMessage('Param id invalide') ];
+export const updateUserValidator = [
+  param('id').isInt(),
+  body('nom').optional().isString().isLength({ min: 1, max: 120 }),
+  body('prenom').optional().isString().isLength({ min: 1, max: 120 }),
+  body('email').optional().isEmail().normalizeEmail(),
+  body('role').optional().isIn(['admin','artiste','employe']),
+];
+
+export const userIdParam = [ param('id').isInt() ];

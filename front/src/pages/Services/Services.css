@@ -181,7 +181,7 @@
 
 /* ======= RWD PACK : tablette & mobile ======= */
 
-/* Tablet ≤ 1024px : allège les espacements */
+/* Tablet ≤ 1024px  */
 @media (max-width: 1024px){
   .services-container{
     padding: 3rem 1rem;
@@ -196,7 +196,7 @@
   }
 }
 
-/* Mobile ≤ 900px : cartes en colonne, image full, textes lisibles */
+/* Mobile ≤ 900px : cartes en colonne */
 @media (max-width: 900px){
   .services-container h1{
     font-size: 2.25rem;
@@ -204,7 +204,7 @@
   }
 
   .service-card{
-    flex-direction: column;           /* image au-dessus du texte */
+    flex-direction: column;           
     align-items: stretch;
     padding: 1.25rem;
     border-radius: 12px;
@@ -212,16 +212,16 @@
   }
 
   .service-card img{
-    width: 100% !important;           /* image plein-article */
+    width: 100% !important;          
     max-width: none !important;
     height: auto !important;
-    aspect-ratio: 16 / 10;            /* stable; mets 4/3 si tu veux plus haut */
-    object-fit: cover;                 /* remplit proprement */
-    padding: 0;                        /* pas de bordure interne */
+    aspect-ratio: 16 / 10;            
+    object-fit: cover;       
+    padding: 0;                  
     border-radius: 10px;
   }
 
-  .service-card > div{                /* bloc texte */
+  .service-card > div{                
     min-width: 0;
   }
   .service-card h2{

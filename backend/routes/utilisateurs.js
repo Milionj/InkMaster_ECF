@@ -34,7 +34,7 @@ const verifyCaptcha = async (token) => {
 router.post(
   '/login',
   validate(loginValidator),
-  sanitizeBody(['email']), // pas de sanitize sur password/captcha
+  sanitizeBody(['email']),
   async (req, res) => {
     const { email, password, captchaToken } = req.body;
 

@@ -1,26 +1,23 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
 import './Navbar.css';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false); // État du menu burger
   const { token, role, logout } = useUser(); // Données du contexte utilisateur
+  const location = useLocation();
 
   // Ouvre/ferme le menu burger
   const toggleBurger = () => {
     setIsOpen(!isOpen);
   };
 
-  const location = useLocation();
-
-useEffect(() => {
-  setIsOpen(false); // ferme le menu burger à chaque changement de route
-}, [location]);
-
+  // Ferme le menu burger à chaque changement de route
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
 
   return (
     <>
@@ -36,13 +33,20 @@ useEffect(() => {
           </Link>
         </div>
 
-        {/* Liens de navigation (affichés selon état de connexion) */}
+        {/* Liens de navigation */}
         <div className={`navbar-links ${isOpen ? 'open' : ''}`}>
           <Link to="/" onClick={toggleBurger}>Accueil</Link>
           <Link to="/services" onClick={toggleBurger}>Services</Link>
           <Link to="/artistes" onClick={toggleBurger}>Artistes</Link>
           <Link to="/contact" onClick={toggleBurger}>Contact</Link>
-          <Link to="/rendez-vous" onClick={toggleBurger}>prendre <strong>rendez-vous</strong></Link>
+
+          {/* 🔹 PUBLIC : bouton "prendre rendez-vous" uniquement si NON connecté */}
+          {!token && (
+            <Link to="/rendez-vous" onClick={toggleBurger}>
+              prendre <strong>rendez-vous</strong>
+            </Link>
+          )}
+
           {/* Si connecté */}
           {token ? (
             <>
@@ -51,20 +55,39 @@ useEffect(() => {
 
               {/* Lien admin visible uniquement pour les admins */}
               {role === 'admin' && (
-                <Link to="/dashboard" onClick={toggleBurger}>Tableau de bord</Link>
+                <Link to="/dashboard" onClick={toggleBurger}>
+                  Tableau de bord
+                </Link>
               )}
 
               {/* Lien artiste spécifique */}
               {role === 'artiste' && (
-                <Link to="/mes-tatouages" onClick={toggleBurger}>Mes tatouages</Link>
-              )}
-              {role === 'artiste' && (
-              <Link to="/moderation" onClick={toggleBurger}>Modérer les avis</Link>
+                <Link to="/mes-tatouages" onClick={toggleBurger}>
+                  Mes tatouages
+                </Link>
               )}
 
+              {role === 'artiste' && (
+                <Link to="/moderation" onClick={toggleBurger}>
+                  Modérer les avis
+                </Link>
+              )}
+
+              {/* 🔹 CONNECTÉ (admin ou artiste) : "Gérer les rendez-vous" */}
+              {(role === 'artiste' || role === 'admin') && (
+                <Link to="/gestion-rendez-vous" onClick={toggleBurger}>
+                  Gérer les rendez-vous
+                </Link>
+              )}
 
               {/* Bouton de déconnexion */}
-              <button className="logout-btn" onClick={() => { logout(); toggleBurger(); }}>
+              <button
+                className="logout-btn"
+                onClick={() => {
+                  logout();
+                  toggleBurger();
+                }}
+              >
                 Déconnexion
               </button>
             </>

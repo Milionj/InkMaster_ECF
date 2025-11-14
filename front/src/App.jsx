@@ -1,83 +1,79 @@
-// Import des modules principaux de React Router
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
-// Import des composants communs du site
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
-import './App.css';
-// Import des pages publiques
-import HomePage from "./pages/Home/HomePage";
-import Confidentialite from "./pages/Confidentialite/Confidentialite";
-import Artistes from "./pages/Artistes/Artiste";
-import Contact from "./pages/Contact/Contact";
-import Login from "./pages/Login/Login";
-import Services from "./pages/Services/Services";
+import "./App.css";
 
-// route protegé pour utilisateursconnecté, gerer tatouage
-import MesTatouages from './pages/MesTatouages/MesTatoo';
+// --- Lazy load pages (un fichier = un chunk) ---
+const HomePage = lazy(() => import("./pages/Home/HomePage"));
+const Confidentialite = lazy(() => import("./pages/Confidentialite/Confidentialite"));
+const Artistes = lazy(() => import("./pages/Artistes/Artiste"));
+const Contact = lazy(() => import("./pages/Contact/Contact"));
+const Login = lazy(() => import("./pages/Login/Login"));
+const Services = lazy(() => import("./pages/Services/Services"));
+const MesTatouages = lazy(() => import("./pages/MesTatouages/MesTatoo"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ModerationGate = lazy(() => import("./components/ModerationAvis/ModerationGate"));
+const RendezVousForm = lazy(() => import("./components/RendezVousForm/RendezVousForm"));
+const RendezVousGestion = lazy(() => import("./components/RendezVousForm/RendezVousGestion"));
 
-// Import de la page Dashboard (admin uniquement)
-import Dashboard from "./pages/Dashboard";
 
-// Import du composant pour protéger certaines routes (connexion requise)
+// Garde ce composant non lazy (léger, utilisé partout)
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Import de la logique qui gère l'accès à la modération des avis (artiste uniquement)
-import ModerationGate from "./components/ModerationAvis/ModerationGate"; // composant sécurisé
-import RendezVousForm from "./components/RendezVousForm/RendezVousForm";
+// Loader ultra simple pendant le chargement des chunks
+function PageLoader() {
+  return <div style={{ padding: "4rem 1rem", textAlign: "center" }}>Chargement…</div>;
+}
 
 export default function App() {
   return (
     <Router>
-      {/* Barre de navigation en haut (logo, liens, menu burger) */}
       <Navbar />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Artiste connecté uniquement */}
+          <Route
+            path="/moderation"
+            element={
+              <ProtectedRoute>
+                <ModerationGate />
+              </ProtectedRoute>
+            }
+          />
 
-      {/* Système de routes centralisées */}
-      <Routes>
-        {/* Route accessible uniquement aux artistes connectés */}
-        <Route
-          path="/moderation"
-          element={
-            <ProtectedRoute>
-              <ModerationGate />
-            </ProtectedRoute>
-          }
-        />
+          {/* Public */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/artistes" element={<Artistes />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/rendez-vous" element={<RendezVousForm />} />
+          <Route path="/gestion-rendez-vous" element={<RendezVousGestion />} />
+          <Route path="/confidentialite" element={<Confidentialite />} />
 
-        {/* Pages publiques accessibles à tous */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/artistes" element={<Artistes />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/rendez-vous" element={<RendezVousForm/>} />
-        <Route path="/confidentialite" element={<Confidentialite />} />
-        {/* Les utilisateurs gerent leurs tatouagees */}
-        <Route
-          path="/mes-tatouages"
-          element={
-            <ProtectedRoute>
-              <MesTatouages />
-            </ProtectedRoute>
-          }
-        />
+          {/* Espace artiste connecté : gérer ses œuvres */}
+          <Route
+            path="/mes-tatouages"
+            element={
+              <ProtectedRoute>
+                <MesTatouages />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Page admin : dashboard sécurisé (role = admin uniquement) */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-
+          {/* Admin */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
       <Footer />
     </Router>
   );

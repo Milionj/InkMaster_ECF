@@ -33,7 +33,7 @@
 }
 
 .service-card img {
-  max-width: 350px;
+  max-width: 450px;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -121,3 +121,166 @@
     margin-bottom: 1rem;
   }
 }
+
+/* ===== SOINS : image au-dessus, très grande, texte propre ===== */
+
+/* Section plus large pour laisser respirer l'image */
+.care-section{
+  max-width: 1400px !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* L'image est un "hero" : très large, centrée, non recadrée par défaut */
+.care-image{
+  display: block !important;
+  width: min(1100px, 98%) !important;  /* grande mais jamais hors cadre */
+  height: auto !important;
+  aspect-ratio: 16 / 10;               /* change en 4/3 si tu veux plus haut */
+  object-fit: cover;                  /* montre 100% de l visuel (pas de crop) */
+  object-position: center;
+  margin: 0 auto 1.75rem auto;          /* centrée, avec espace sous l'image */
+  border: 4px solid #000;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0,0,0,.10);
+}
+
+/* Le wrapper de texte : une seule colonne, centré et lisible */
+.care-layout{
+  display: block !important;           /* annule les anciens flex/grid */
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.care-text{
+  display: grid;
+  gap: .6rem;
+}
+
+.care-text h3{
+  margin: 0;
+  font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+}
+
+.care-text p{
+  margin: 0;
+  font-size: clamp(.95rem, 1.1vw, 1rem);
+  line-height: 1.7;
+  color: #111;
+  max-inline-size: 60ch;               /* longueur de ligne confortable */
+}
+
+/* Mobile : image un peu moins panoramique, toujours centrée */
+@media (max-width: 900px){
+  .care-image{
+    width: 100% !important;
+    aspect-ratio: 4 / 3;               /* plus haut sur petit écran */
+  }
+}
+
+/* ======= RWD PACK : tablette & mobile ======= */
+
+/* Tablet ≤ 1024px  */
+@media (max-width: 1024px){
+  .services-container{
+    padding: 3rem 1rem;
+    gap: 3rem;
+  }
+  .service-card{
+    gap: 1.25rem;
+  }
+  .care-section{
+    max-width: 1200px;
+    padding: 2.25rem 2rem;
+  }
+}
+
+/* Mobile ≤ 900px : cartes en colonne */
+@media (max-width: 900px){
+  .services-container h1{
+    font-size: 2.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .service-card{
+    flex-direction: column;           
+    align-items: stretch;
+    padding: 1.25rem;
+    border-radius: 12px;
+    gap: 1rem;
+  }
+
+  .service-card img{
+    width: 100% !important;          
+    max-width: none !important;
+    height: auto !important;
+    aspect-ratio: 16 / 10;            
+    object-fit: cover;       
+    padding: 0;                  
+    border-radius: 10px;
+  }
+
+  .service-card > div{                
+    min-width: 0;
+  }
+  .service-card h2{
+    font-size: 1.5rem;
+    margin: .5rem 0 .5rem;
+  }
+  .service-card p{
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: none;
+  }
+
+  /* Section Soins (image au-dessus, texte centré) */
+  .care-section{
+    max-width: 100%;
+    padding: 1.75rem 1rem;
+  }
+  .care-image{
+    width: 100% !important;
+    aspect-ratio: 4 / 3;              /* un peu plus haut sur mobile */
+    object-fit: cover;                 /* “hero” visuel */
+    margin: 0 0 1rem 0;               /* espace sous l’image */
+    border-width: 3px;
+    border-radius: 10px;
+  }
+  .care-layout{
+    display: block !important;        /* une colonne */
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .care-text{
+    gap: .5rem;
+  }
+  .care-text h3{
+    font-size: 1.1rem;
+    margin: 0 0 .25rem 0;
+  }
+  .care-text p{
+    font-size: .98rem;
+    line-height: 1.65;
+    max-inline-size: 60ch;
+  }
+}
+
+/* Small mobile ≤ 480px : compacter */
+@media (max-width: 480px){
+  .services-container{
+    padding: 2rem .75rem;
+    gap: 2rem;
+  }
+  .service-card{
+    padding: 1rem;
+  }
+  .care-section{
+    padding: 1.25rem .75rem;
+  }
+  .care-image{
+    border-radius: 8px;
+  }
+}
+

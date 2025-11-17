@@ -3,13 +3,8 @@ services:
     build: ./backend
     ports:
       - "5000:5000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_NAME=inkmaster_db
-      - JWT_SECRET=inkmasterSecret
-      - RECAPTCHA_SECRET=6LeKCXUrAAAAACsSZ9x0MzkVCMM95d_hkgLp_yCk
+    env_file:
+      - ./backend/.env           # le backend lit les variables ici (DB_HOST=db, DB_PORT=3306, etc.)
     depends_on:
       db:
         condition: service_healthy
@@ -17,20 +12,24 @@ services:
 
   db:
     image: mysql:8.0
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --skip-host-cache
+      --skip-name-resolve
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: inkmaster_db
     ports:
-      - "3307:3306"
+      - "3307:3306"              # Accès MySQL depuis ta machine: localhost:3307
     volumes:
       - db_data:/var/lib/mysql
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 10s
       timeout: 5s
-      retries: 5
-
+      retries: 10
+      start_period: 30s
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -44,10 +43,11 @@ services:
   frontend:
     build: ./front
     ports:
-      - "5173:80"
+      - "5173:80"                # site servi par Nginx sur 80 dans le conteneur
     depends_on:
       - backend
     restart: always
 
 volumes:
   db_data:
+  

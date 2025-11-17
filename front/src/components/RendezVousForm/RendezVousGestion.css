@@ -1,0 +1,175 @@
+.rdv-gestion-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: #f7f4ff;
+}
+
+.rdv-gestion-container {
+  width: 100%;
+  max-width: 1100px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 2rem 2rem 2.5rem;
+}
+
+.rdv-gestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.rdv-gestion-header h1 {
+  font-family: "Squada One", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-size: 2rem;
+  color: #340873;
+  margin-bottom: 0.25rem;
+}
+
+.rdv-gestion-header p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.rdv-filtre-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.rdv-filtre-wrapper label {
+  color: #444;
+}
+
+.rdv-filtre-wrapper select {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+/* Table */
+.rdv-table {
+  width: 100%;
+  margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.rdv-table-header,
+.rdv-table-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr 1.1fr 2.2fr 1.1fr 0.9fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  align-items: center;
+}
+
+.rdv-table-header {
+  background: #340873;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.rdv-table-row:nth-child(odd) {
+  background: #fafafa;
+}
+
+.rdv-table-row:nth-child(even) {
+  background: #ffffff;
+}
+
+.rdv-cell {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.rdv-contact div {
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.rdv-message {
+  font-size: 0.85rem;
+  max-height: 4.6em;
+  overflow: hidden;
+}
+
+.rdv-select {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.rdv-select-en_attente {
+  background: #fff7e0;
+  color: #8a5b00;
+}
+
+.rdv-select-confirme {
+  background: #e4fff4;
+  color: #0b7f53;
+}
+
+.rdv-select-annule {
+  background: #ffe5e5;
+  color: #b82020;
+}
+
+.rdv-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+.rdv-btn-delete {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+  background: #ff4f4f;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.rdv-btn-delete:hover {
+  background: #e13a3a;
+  transform: translateY(-1px);
+}
+
+.rdv-error {
+  color: #b82020;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .rdv-gestion-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rdv-table-header,
+  .rdv-table-row {
+    grid-template-columns: 1.3fr 1.7fr 1.2fr 2.4fr;
+    grid-auto-rows: auto;
+    row-gap: 0.5rem;
+  }
+
+  .rdv-table-header span:nth-child(5),
+  .rdv-table-header span:nth-child(6),
+  .rdv-table-row .rdv-cell:nth-child(5),
+  .rdv-table-row .rdv-cell:nth-child(6) {
+    display: none;
+  }
+}

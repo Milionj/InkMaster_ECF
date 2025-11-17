@@ -1,65 +1,65 @@
 import React, { useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
-import './Contact.css';
+import "./Contact.css";
 
 const Contact = () => {
-  const [nom, setNom] = useState('');
-  const [prenom, setPrenom] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [confirmation, setConfirmation] = useState('');
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [erreur, setErreur] = useState("");
+
+  const validateEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErreur("");
+    setConfirmation("");
+
+    if (!nom || !prenom || !email || !message) {
+      return setErreur("Tous les champs sont obligatoires.");
+    }
+
+    if (!validateEmail(email)) {
+      return setErreur("Adresse email invalide.");
+    }
 
     try {
       await addDoc(collection(db, "contact"), {
-        nom,
-        prenom,
-        email,
-        message,
-        createdAt: serverTimestamp()
+        nom: nom.trim(),
+        prenom: prenom.trim(),
+        email: email.trim(),
+        message: message.trim(),
+        createdAt: serverTimestamp(),
       });
 
-      setConfirmation("Merci pour votre message !");
-      setNom('');
-      setPrenom('');
-      setEmail('');
-      setMessage('');
+      setConfirmation("✅ Message envoyé !");
+      setNom("");
+      setPrenom("");
+      setEmail("");
+      setMessage("");
     } catch (error) {
-      console.error("Erreur lors de l'envoi :", error);
-      setConfirmation("Erreur lors de l'envoi. Réessayez.");
+      console.error(error);
+      setErreur("❌ Erreur d'envoi. Réessayez.");
     }
   };
 
   return (
     <div className="contact-page">
-      <h1>Contactez-nous</h1>
-
+      <h1>Nous contacter</h1>
       <form onSubmit={handleSubmit} className="contact-form">
         <label>Nom</label>
-        <input
-          type="text"
-          placeholder="nom"
-          value={nom}
-          onChange={(e) => setNom(e.target.value)}
-          required
-        />
+        <input value={nom} onChange={(e) => setNom(e.target.value)} required />
 
         <label>Prénom</label>
-        <input
-          type="text"
-          placeholder="prenom"
-          value={prenom}
-          onChange={(e) => setPrenom(e.target.value)}
-          required
-        />
+        <input value={prenom} onChange={(e) => setPrenom(e.target.value)} required />
 
         <label>Email</label>
         <input
           type="email"
-          placeholder="email valide"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -67,7 +67,6 @@ const Contact = () => {
 
         <label>Message</label>
         <textarea
-          placeholder="texte"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           required
@@ -77,6 +76,7 @@ const Contact = () => {
       </form>
 
       {confirmation && <p className="confirmation">{confirmation}</p>}
+      {erreur && <p className="error">{erreur}</p>}
     </div>
   );
 };

@@ -1,71 +1,223 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
+/* =========================
+   DASHBOARD – look & feel
+   ========================= */
+
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --ink: #0b0b0b;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --accent: #35598f;        
+  --danger: #5F6982;        /* rouge supprimer */
+  --radius: 14px;
+  --shadow: 0 12px 30px rgba(10,10,10,.08);
 }
 
-.dashboard-container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 20px;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+body { background: var(--bg); }
+
+/* ===== Container ===== */
+.dashboard-container{
+  max-width: 1200px;
+  margin: 48px auto;
+  padding: 24px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
-h1, h2 {
+/* ===== Titles ===== */
+h1{
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
   text-align: center;
-  color: #333;
+  color: var(--ink);
+  margin: 0 0 10px 0;
+  font-weight: 800;
+}
+h2{
+  font-size: 1.25rem;
+  margin: 32px 0 14px;
+  color: var(--ink);
+  position: relative;
+}
+h2::after{
+  content:"";
+  display:block;
+  height:3px; width:56px;
+  background: var(--ink);
+  border-radius: 999px;
+  margin-top: 6px;
 }
 
-h1 {
-  margin-top: 45px; /* Espace supérieur */
-  margin-bottom: 20px; /* Garde l’espace en dessous */
-  color: #333;
-  font-weight: bold;
+/* ===== Errors ===== */
+.error{
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-align: center;
 }
 
+/* ===== Forms (inline, clean) ===== */
+section form{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+  gap: 10px;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+section form input,
+section form select{
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+  font-size: .95rem;
+}
+section form input:focus,
+section form select:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(154,0,255,.12);
+}
 
-table {
+/* Submit button */
+section form button[type="submit"]{
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform .12s ease, background .2s ease;
+}
+section form button[type="submit"]:hover{ background:#272727; }
+section form button[type="submit"]:active{ transform: translateY(1px); }
+
+/* ===== Tables ===== */
+table{
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden; /* arrondis sur le tableau */
+  margin-top: 14px;
 }
 
-table th, table td {
-  border: 1px solid #ccc;
-  padding: 8px;
+/* thead */
+table th{
+  background: #0f0f10;
+  color: #fff;
+  padding: 12px;
   text-align: center;
+  font-weight: 700;
+  letter-spacing: .2px;
+  white-space: nowrap;
 }
 
-table th {
-  background: #333;
-  color: #fff;
+/* body */
+table td{
+  padding: 10px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+  vertical-align: middle;
+}
+tbody tr:nth-child(even){ background: #fbfbfc; }
+tbody tr:hover{ background: #f4f6ff; }
+
+/* Inputs inside table cells */
+table td input{
+  width: 100%;
+  max-width: 280px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: #f7f7f8;
+  outline: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+table td input:focus{
+  background: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(154,0,255,.10);
 }
 
-button {
-  padding: 6px 12px;
-  background: #333;
+/* Tattoo preview images */
+table td img{
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  border: 1px solid var(--line);
+}
+
+/* Row action button (delete) */
+table td button{
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--danger);
+  background: var(--danger);
   color: #fff;
-  border: none;
-  border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
+  transition: filter .18s ease, transform .12s ease;
+}
+table td button:hover{ filter: brightness(.95); }
+table td button:active{ transform: translateY(1px); }
+
+/* ===== Utilities ===== */
+.refresh-btn{
+  display: inline-block;
+  margin: 12px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.refresh-btn:hover{ background: var(--ink); color: #fff; }
+
+/* ===== Responsive ===== */
+
+/* Scroll horizontal du tableau sur mobile, sans casser la mise en page */
+@media (max-width: 900px){
+  .dashboard-container{
+    margin: 24px 12px;
+    padding: 16px;
+  }
+  section form{
+    grid-template-columns: 1fr 1fr;
+  }
+  section table{
+    display: block;
+    width: 100%;
+    overflow-x: auto;            /* swipe horizontal */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+  table thead, table tbody, table tr{
+    width: max-content;          /* évite le rétrécissement des colonnes */
+  }
+  table td input{
+    max-width: 220px;
+  }
 }
 
-button:hover {
-  background: #555;
-}
-
-img {
-  max-width: 70px;
-  border-radius: 5px;
-}
-
-.error {
-  color: red;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.refresh-btn {
-  display: block;
-  margin: 20px auto;
+/* Extra-compact ≤ 520px */
+@media (max-width: 520px){
+  section form{
+    grid-template-columns: 1fr;  /* champs sur une colonne */
+  }
+  h2{ margin-top: 24px; }
+  table td{ padding: 8px; }
+  table th{ padding: 10px; }
 }

@@ -1,0 +1,64 @@
+.confidentialite-container {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 2rem 3rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #222;
+  font-family: "Poppins", sans-serif;
+  line-height: 1.7;
+}
+
+/* Titre principal */
+.confidentialite-container h1 {
+  font-size: 2rem;
+  color: #000000ff; /* violet foncé InkMaster */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Sous-titres (articles) */
+.confidentialite-container h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  color: #000000ff; /* violet clair InkMaster */
+  font-size: 1.3rem;
+  border-left: 4px solid #35598f;
+  padding-left: 0.8rem;
+}
+
+/* Paragraphes */
+.confidentialite-container p {
+  margin-bottom: 1.2rem;
+  text-align: justify;
+  font-size: 1rem;
+}
+
+/* Texte en gras */
+.confidentialite-container strong {
+  color: #000;
+}
+
+/* Footer interne de la page */
+.footer-note {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .confidentialite-container {
+    padding: 1.5rem;
+  }
+
+  .confidentialite-container h1 {
+    font-size: 1.6rem;
+  }
+
+  .confidentialite-container h2 {
+    font-size: 1.2rem;
+  }
+}

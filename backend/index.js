@@ -12,11 +12,33 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: '*',
+// app.use(cors({
+//   origin: '*',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+//   credentials: true
+// }));
+
+//  CORS piloté par .env (ex: CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000)
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:5173')
+  .split(',')
+  .map(s => s.trim());
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Autorise les requêtes server-to-server ou Postman (sans origin)
+    if (!origin) return callback(null, true);
+    return allowedOrigins.includes(origin)
+      ? callback(null, true)
+      : callback(new Error(`CORS not allowed: ${origin}`));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true
-}));
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+// app.options('*', cors(corsOptions));
+app.options(/.*/, cors(corsOptions)); //Express 5
+
 
 
 app.use(express.json());

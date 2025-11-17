@@ -1,109 +1,232 @@
-.artist-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 4rem 2rem;
+/* ====== Variables & bases ====== */
+:root{
+  --container: 1200px;
+  --radius: 14px;
+  --gap: clamp(1rem, 2.4vw, 2rem);
+  --shadow: 0 10px 28px rgba(0,0,0,.08);
+  --black: #000;
+  --white: #fff;
+  --muted: #666;
+  --accent: #35598f; /* optionnel : couleur focus/hover */
 }
 
-.artist-block {
-  border: 2px solid #000;
-  padding: 3rem;
-  margin-bottom: 4rem;
-  border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+.artist-container{
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: clamp(2rem, 4vw, 4rem) clamp(1rem, 3vw, 2rem);
 }
 
-/* Header avec image et texte */
-.artist-header {
-  display: flex;
+/* ====== Carte artiste ====== */
+.artist-block{
+  border: 2px solid var(--black);
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: clamp(1.5rem, 3vw, 3rem);
+  box-shadow: var(--shadow);
+  margin-block: clamp(1.5rem, 3.5vw, 4rem);
+}
+
+/* ====== En-tête (photo + texte) ====== */
+.artist-header{
+  display: grid;
+  grid-template-columns: minmax(160px, clamp(160px, 22vw, 220px)) 1fr;
   align-items: center;
-  gap: 2rem;
-  background-color: #000;
-  color: #fff;
-  border-radius: 10px;
+  gap: var(--gap);
+  background: var(--black);
+  color: var(--white);
+  border-radius: calc(var(--radius) - 2px);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
   overflow: hidden;
-  padding: 1.5rem;
 }
 
-.artist-header img {
-  width: 220px;
-  height: 220px;
+.artist-header img{
+  width: 100%;
+  aspect-ratio: 1 / 1;               /* évite les sauts de mise en page */
   object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,.12);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
 }
 
-.artist-desc {
-  flex: 1;
+.artist-desc{ inline-size: 100%; }
+.artist-desc h3{
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  margin: 0 0 .6rem 0;
+  letter-spacing: .2px;
+}
+.artist-desc p{
+  font-size: clamp(2rem, 1.2vw, 3.1rem);
+  line-height: 1.65;
+  margin: 0 0 .75rem 0;
+  color: rgba(255,255,255,.88);
+}
+.artist-desc span{
+  font-size: .9rem;
+  opacity: .82;
 }
 
-.artist-desc h3 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-}
-
-.artist-desc p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
-.artist-desc span {
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-/* Carrousel tattoo */
-.tattoo-carousel {
-  display: flex;
+/* ====== Carrousel ====== */
+.tattoo-carousel{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: var(--gap);
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-.carousel-arrow {
-  padding: 0.8rem 1.5rem;
-  background-color: #000;
-  color: #fff;
-  border: none;
-  font-size: 1.2rem;
+/* Boutons flèches : accessibles, hit-area 44px */
+.carousel-arrow{
+  inline-size: 44px;
+  block-size: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid #111;
+  background: var(--black);
+  color: var(--white);
+  font-size: 1.1rem;
   cursor: pointer;
-  border-radius: 6px;
-  transition: background 0.3s;
+  transition: transform .15s ease, opacity .2s ease, box-shadow .2s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,.15);
 }
-
-.carousel-arrow:hover {
-  background-color: #444;
+.carousel-arrow:hover{ transform: translateY(-1px); }
+.carousel-arrow:active{ transform: translateY(0); }
+.carousel-arrow:focus-visible{
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
-
-.carousel-arrow:disabled {
-  background-color: #999;
+.carousel-arrow:disabled{
+  opacity: .45;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Affichage du tatouage */
-.tattoo-display {
+/* ====== Zone d’affichage du tatouage ====== */
+.tattoo-display{
   text-align: center;
+  max-inline-size: min(540px, 90vw);
+  margin-inline: auto;
 }
-
-.tattoo-display img {
-  width: 320px;
-  height: auto;
+.tattoo-display img{
+  inline-size: 100%;
+  max-inline-size: 420px;
+  aspect-ratio: 4 / 5;               /* ratio vertical agréable pour tattoos */
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  margin-block-end: .9rem;
+  border: 1px solid #eee;
+  box-shadow: 0 8px 22px rgba(0,0,0,.12);
+  transition: transform .25s ease;
 }
+.tattoo-display img:hover{ transform: scale(1.015); }
 
-.tattoo-display h4 {
-  font-size: 1.4rem;
-  margin: 0.5rem 0;
+.tattoo-display h4{
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  margin: .4rem 0 .2rem;
 }
-
-.tattoo-display p {
-  max-width: 500px;
+.tattoo-display p{
   margin: 0 auto;
   font-size: 1rem;
+  line-height: 1.6;
   color: #333;
+  max-inline-size: 46ch;
 }
+
+/* ====== Responsive ====== */
+@media (max-width: 900px){
+  .artist-header{
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .artist-header img{
+    max-inline-size: 260px;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 520px){
+  .tattoo-carousel{ gap: 1rem; }
+  .artist-block{ padding: 1.25rem; }
+}
+
+/* ====== Préférence utilisateur : réduire les animations ====== */
+@media (prefers-reduced-motion: reduce){
+  .carousel-arrow,
+  .tattoo-display img{
+    transition: none;
+  }
+}
+
+/* === Images d'artistes plus grosses === */
+.artist-header{
+  grid-template-columns: minmax(240px, clamp(300px, 28vw, 380px)) 1fr;
+  padding: clamp(1.25rem, 2.8vw, 2rem);
+}
+
+
+.artist-header img{
+  aspect-ratio: 4/ 5;      
+  border-radius: 12px;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 900px){
+  .artist-header{ grid-template-columns: 1fr; }
+  .artist-header img{
+    max-inline-size: 340px;
+  }
+}
+
+@media (max-width: 520px){
+  .artist-header img{
+    max-inline-size: 300px;
+  }
+}
+/* = photo grande + texte collé ==== */
+.artist-header{
+  display: grid !important;
+  grid-template-columns: clamp(420px, 42vw, 680px) 1fr !important; /* colonne image large */
+  align-items: center;
+  gap: 12px !important;                 /* colle le texte à la photo */
+  padding: 16px !important;
+  background: #000; color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* agrandir vraiment l'image */
+.artist-header .artist-photo,
+.artist-header img{
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  aspect-ratio: 3 / 4 !important;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,.12);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  margin: 0 !important;
+}
+
+/* éviter que le texte soit tronqué/éloigné */
+.artist-desc{ min-width: 0 !important; }
+.artist-desc h3{ margin: 0 0 8px 0; }
+.artist-desc p{ margin: 0 0 10px 0; line-height: 1.6; }
+
+/* Mobile : image au-dessus, toujours grande */
+@media (max-width: 900px){
+  .artist-header{
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .artist-header .artist-photo,
+  .artist-header img{
+    width: 100% !important;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+}
+
+

@@ -1,42 +1,106 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './Navbar.css'; // On importe le fichier CSS de la navbar
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
+
+import './Navbar.css';
 
 function Navbar() {
-  // État pour ouvrir/fermer le menu burger
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // État du menu burger
+  const { token, role, logout } = useUser(); // Données du contexte utilisateur
+  const location = useLocation();
 
-  // Fonction pour basculer l'ouverture du menu
+  // Ouvre/ferme le menu burger
   const toggleBurger = () => {
     setIsOpen(!isOpen);
   };
 
+  // Ferme le menu burger à chaque changement de route
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
+
   return (
     <>
-      {/* Overlay sombre qui s'affiche derrière le menu ouvert (mobile) */}
+      {/* Overlay sombre en arrière-plan quand le menu est ouvert (mobile) */}
       {isOpen && <div className="overlay" onClick={toggleBurger}></div>}
 
       {/* Barre de navigation principale */}
       <nav className="navbar">
-        {/* Logo cliquable qui renvoie vers la page d'accueil */}
+        {/* Logo (cliquable) */}
         <div className="navbar-left">
-          <a href="/" className="logo">
+          <Link to="/" className="logo">
             <span className="logo-blue">Ink</span>Master
-          </a>
+          </Link>
         </div>
 
-        {/* Liens de navigation visibles en version desktop */}
+        {/* Liens de navigation */}
         <div className={`navbar-links ${isOpen ? 'open' : ''}`}>
-          <a href="/">Accueil</a>
-          <a href="/services">Services</a>
-          <a href="/artistes">Artistes</a>
-          <a href="/contact">Contact</a>
-          <a href="/login" className="login-btn">Se connecter</a>
+          <Link to="/" onClick={toggleBurger}>Accueil</Link>
+          <Link to="/services" onClick={toggleBurger}>Services</Link>
+          <Link to="/artistes" onClick={toggleBurger}>Artistes</Link>
+          <Link to="/contact" onClick={toggleBurger}>Contact</Link>
+
+          {/* 🔹 PUBLIC : bouton "prendre rendez-vous" uniquement si NON connecté */}
+          {!token && (
+            <Link to="/rendez-vous" onClick={toggleBurger}>
+              prendre <strong>rendez-vous</strong>
+            </Link>
+          )}
+
+          {/* Si connecté */}
+          {token ? (
+            <>
+              {/* Affiche le rôle de l’utilisateur (admin ou artiste) */}
+              <span className="user-role">Connecté : {role}</span>
+
+              {/* Lien admin visible uniquement pour les admins */}
+              {role === 'admin' && (
+                <Link to="/dashboard" onClick={toggleBurger}>
+                  Tableau de bord
+                </Link>
+              )}
+
+              {/* Lien artiste spécifique */}
+              {role === 'artiste' && (
+                <Link to="/mes-tatouages" onClick={toggleBurger}>
+                  Mes tatouages
+                </Link>
+              )}
+
+              {role === 'artiste' && (
+                <Link to="/moderation" onClick={toggleBurger}>
+                  Modérer les avis
+                </Link>
+              )}
+
+              {/* 🔹 CONNECTÉ (admin ou artiste) : "Gérer les rendez-vous" */}
+              {(role === 'artiste' || role === 'admin') && (
+                <Link to="/gestion-rendez-vous" onClick={toggleBurger}>
+                  Gérer les rendez-vous
+                </Link>
+              )}
+
+              {/* Bouton de déconnexion */}
+              <button
+                className="logout-btn"
+                onClick={() => {
+                  logout();
+                  toggleBurger();
+                }}
+              >
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            // Sinon : lien de connexion
+            <Link to="/login" className="login-btn" onClick={toggleBurger}>
+              Se connecter
+            </Link>
+          )}
         </div>
 
-        {/* Icône menu burger (visible uniquement sur mobile) */}
+        {/* Bouton burger visible en mobile */}
         <div className="burger" onClick={toggleBurger}>
-          {/* rotate = effet croix */}
           <div className={`line ${isOpen ? 'rotate1' : ''}`}></div>
           <div className={`line ${isOpen ? 'fade' : ''}`}></div>
           <div className={`line ${isOpen ? 'rotate2' : ''}`}></div>

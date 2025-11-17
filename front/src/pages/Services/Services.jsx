@@ -38,9 +38,8 @@ const Services = () => {
       </div>
 <div className="care-section">
   <h2>Prenez soin de vous</h2>
-
-  <div className="care-layout">
     <img src="/images/Soins.webp" alt="Soins" className="care-image" />
+  <div className="care-layout">
 
     <div className="care-text">
       <h3>Votre attention !</h3>

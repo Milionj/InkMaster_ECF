@@ -1,60 +1,115 @@
+/* Empêche la barre de scroll horizontale */
+body {
+  overflow-x: hidden;
+}
+
+/* Conteneur principal de la page contact */
 .contact-page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 50px 20px;
+  padding: 4rem 1rem;
+  min-height: calc(100vh - 160px); /* prend en compte header + footer */
+  box-sizing: border-box;
+  background-color: #f9f9f9;
 }
 
+/* Titre */
 .contact-page h1 {
-  font-size: 2rem;
-  margin-bottom: 30px;
+  font-size: 2.2rem;
+  color: #000000ff;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
+/* Formulaire */
 .contact-form {
-  background: #e6e6e6;
-  padding: 30px;
-  border-radius: 6px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  max-width: 400px;
+  max-width: 600px;
   width: 100%;
+  background-color: #f5f5f5;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
+/* Éléments du formulaire */
 .contact-form label {
-  font-weight: bold;
-  margin-bottom: 4px;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #333;
 }
 
 .contact-form input,
 .contact-form textarea {
-  padding: 10px;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1.2rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
 }
 
 .contact-form textarea {
+  min-height: 120px;
   resize: vertical;
-  min-height: 80px;
 }
 
 .contact-form button {
-  background-color: #34508d; /* même couleur que bouton Se connecter */
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #000;
   color: white;
-  padding: 12px;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .contact-form button:hover {
-  background-color: #2c4176;
+  background-color: #222;
 }
 
+/* Message de confirmation */
 .confirmation {
-  margin-top: 15px;
+  margin-top: 1rem;
   color: green;
+  text-align: center;
   font-weight: bold;
+}
+
+/* Empêche scroll horizontal */
+body {
+  overflow-x: hidden;
+  margin: 0;
+}
+
+/* Conteneur principal qui pousse le footer en bas */
+.contact-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1rem;
+  min-height: calc(100vh - 120px); /* hauteur vue - header + footer estimés */
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+  .contact-page {
+    padding: 2rem 1rem;
+  }
+
+  .contact-form {
+    padding: 1.5rem;
+  }
+
+  .contact-page h1 {
+    font-size: 1.8rem;
+  }
 }

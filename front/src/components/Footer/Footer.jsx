@@ -1,5 +1,7 @@
-import React from 'react';
-import './Footer.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import "../../pages/Confidentialite/Confidentialite"
+import "./Footer.css";
 
 const Footer = () => {
   return (
@@ -20,6 +22,9 @@ const Footer = () => {
         >
           Pinterest
         </a>
+        <Link to="/confidentialite" className="footer-link">
+          Politique de confidentialité & CGU
+        </Link>
       </div>
     </footer>
   );

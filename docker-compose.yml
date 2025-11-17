@@ -1,55 +1,53 @@
-version: "3.8"
-
 services:
-
-  # BACKEND - API Express
   backend:
-    build: ./backend                      # Construit l'image depuis le dossier backend/
+    build: ./backend
     ports:
-      - "5000:5000"                       # Rend l'API accessible sur http://localhost:5000
+      - "5000:5000"
     env_file:
-      - ./backend/.env                   # Charge les variables d'environnement (BDD, JWT, reCAPTCHA)
+      - ./backend/.env           # le backend lit les variables ici (DB_HOST=db, DB_PORT=3306, etc.)
     depends_on:
       db:
-        condition: service_healthy       # Attend que la BDD MySQL soit prête avant de démarrer
-    restart: always                      # Redémarre en cas de crash
+        condition: service_healthy
+    restart: always
 
-  # BASE DE DONNÉES - MySQL
   db:
-    image: mysql:8.0                     # Image officielle MySQL
+    image: mysql:8.0
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --skip-host-cache
+      --skip-name-resolve
     environment:
-      MYSQL_ROOT_PASSWORD: root         # Mot de passe root
-      MYSQL_DATABASE: inkmaster_db      # Crée cette base au démarrage
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inkmaster_db
     ports:
-      - "3307:3306"                      # Redirige le port local 3307 vers le port MySQL interne 3306
+      - "3307:3306"              # Accès MySQL depuis ta machine: localhost:3307
     volumes:
-      - db_data:/var/lib/mysql          # Stockage persistant des données
+      - db_data:/var/lib/mysql
     restart: always
-    healthcheck:                        # Vérifie si la base est opérationnelle
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 5s
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
-  # INTERFACE PHPMyAdmin
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin        # Interface graphique pour gérer MySQL
+    image: phpmyadmin/phpmyadmin
     ports:
-      - "8080:80"                        # Accessible sur http://localhost:8080
+      - "8080:80"
     environment:
-      - PMA_HOST=db                     # Nom du service MySQL à utiliser (doit matcher `db`)
-      - MYSQL_ROOT_PASSWORD=root        # Mot de passe root MySQL
+      - PMA_HOST=db
+      - MYSQL_ROOT_PASSWORD=root
     restart: always
 
-  # FRONTEND - React/Vite
   frontend:
-    build: ./front                      # Construit l'image depuis le dossier front/
+    build: ./front
     ports:
-      - "5173:80"                        # Frontend disponible sur http://localhost:5173
+      - "5173:80"                # site servi par Nginx sur 80 dans le conteneur
     depends_on:
-      - backend                         # Démarre après le backend
+      - backend
     restart: always
 
-# VOLUMES PERSISTANTS
 volumes:
-  db_data:                              # Conserve les données de MySQL entre les redémarrages
+  db_data:
+  

@@ -91,7 +91,7 @@ transition: 0.3s ease;
     display: flex;
   }
 
-  /* Menu mobile masqué par défaut (slide depuis la droite) */
+  /* Menu mobile masqué par défaut a droite) */
   .navbar-links {
     position: absolute;
     top: 60px;

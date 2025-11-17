@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './CommentsSection.css';
+import './CommentsSection.css'
 import {
   collection,
   addDoc,

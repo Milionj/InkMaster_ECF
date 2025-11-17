@@ -1,27 +1,39 @@
-// importer la fonction pour definir la configuration Vite
-import { defineConfig } from 'vite'
-// Plugin officiel pour suppoorter React (JSX, HMR..)
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
 
-  // Configuration du server Vite de developpement
-
+  // Dev proxy (mets 5000 si ton backend local tourne sur 5000)
   server: {
     proxy: {
-      // Toute requète frontend commençant par '/api' sera redirigée 
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
 
-      '/api':  {
-        target: 'http://localhost:3001', // Backend express qui tourne sur le port 3001
-
-        changeOrigin : true, // changer l'en-tete 'origin' pour éviter les erreurs CORS
-        rewrite: path => path.replace(/^\/api/,'')
-        // retire `/api` du chemin envoyé au backend
-        // Exemple : `/api/ping-db` devient `/ping-db` côté Express
-
-      }
-    }
-  }
+  // Build prod optimisé
+  esbuild: {
+    drop: ["console", "debugger"], // nettoie le JS
+  },
+  build: {
+    target: "es2018",
+    sourcemap: false,
+    chunkSizeWarningLimit: 900, // juste pour calmer l’alerte pendant la transition
+    rollupOptions: {
+      output: {
+        // Sépare chaque lib node_modules dans son propre fichier vendor-xxx.js
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            const parts = id.split("node_modules/")[1].split("/");
+            const name = parts[0].startsWith("@") ? `${parts[0]}-${parts[1]}` : parts[0];
+            return `vendor-${name}`;
+          }
+        },
+      },
+    },
+  },
 });

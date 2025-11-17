@@ -1,3 +1,4 @@
+// front/src/pages/Login/Login.jsx
 import { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -28,9 +29,10 @@ export default function Login() {
     return regex.test(email);
   };
 
-  // Fonction pour vérifier que le mot de passe est valide (lettres + chiffres, au moins 6 caractères)
+  // Mot de passe fort : 12 caractères min, maj, min, chiffre, caractère spécial
   const validatePassword = (password) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{12,}$/;
     return regex.test(password);
   };
 
@@ -55,7 +57,7 @@ export default function Login() {
     // Vérification du format du mot de passe
     if (!validatePassword(password)) {
       setPasswordError(
-        "Mot de passe invalide : au moins 6 caractères avec lettres et chiffres"
+        "Mot de passe invalide : minimum 12 caractères avec majuscule, minuscule, chiffre et caractère spécial."
       );
       return;
     } else {
@@ -79,9 +81,7 @@ export default function Login() {
       // Si la connexion réussit, on stocke le token JWT et le rôle dans le localStorage
       const { token, role } = res.data;
 
-      // a verifier
-      // ------------------------------------------------------------------------------------------------
-      // Connexion à Firebase Auth en parallèle du backend
+      // Connexion à Firebase Auth (optionnel, commenté pour l’instant)
       // const firebaseAuth = getAuth();
       // await signInWithEmailAndPassword(firebaseAuth, email, password);
 

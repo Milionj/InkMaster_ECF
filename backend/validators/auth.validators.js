@@ -1,12 +1,19 @@
 import { body } from 'express-validator';
 
+const strongPasswordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{12,}$/;
+
 export const loginValidator = [
   body('email')
-    .isEmail().withMessage("Email invalide")
+    .isEmail()
+    .withMessage("Email invalide")
     .normalizeEmail(),
   body('password')
-    .isLength({ min: 6, max: 128 }).withMessage("Mot de passe invalide"),
+    .matches(strongPasswordRegex)
+    .withMessage("Mot de passe trop faible"),
   body('captchaToken')
-    .isString().withMessage("Token reCAPTCHA manquant")
-    .notEmpty().withMessage("Token reCAPTCHA requis"),
+    .isString()
+    .withMessage("Token reCAPTCHA manquant")
+    .notEmpty()
+    .withMessage("Token reCAPTCHA requis"),
 ];

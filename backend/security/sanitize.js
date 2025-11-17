@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
-// Par défaut: aucune balise/attribut autorisés (texte brut)
+// Par défaut: aucune balise/attribut autorisés (aucune balise HTML autorisée = texte brut)
 const defaultCfg = { ALLOWED_TAGS: [], ALLOWED_ATTR: [] };
 
 export const cleanString = (val, cfg = defaultCfg) => {

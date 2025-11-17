@@ -1,27 +1,43 @@
 import express from 'express';
-import db from '../db.js';
+import db from '../db.js'; // encore utilisé pour les routes admin plus bas
 import { verifyToken, isAdmin } from '../middleware/verifyToken.js';
+import { Tatouage, User } from '../models/index.js';
 
 const router = express.Router();
 
-//  Route publique pour la galerie (vitrine)
-router.get('/public', async (req, res) => {
+/* -------- Route publique vitrine (Sequelize) -------- */
+router.get('/public', async (_req, res) => {
   try {
-    const [rows] = await db.execute(`
-      SELECT t.id_tatouage AS id, t.titre, t.image, t.description, 
-             u.nom AS nom_artiste, u.prenom AS prenom_artiste
-      FROM tatouage t
-      JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-    `);
-    res.json(rows);
+    const tattoos = await Tatouage.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ['nom', 'prenom'],
+        },
+      ],
+    });
+
+    // même format que la version SQL
+    const result = tattoos.map((t) => ({
+      id: t.id_tatouage,           
+      titre: t.titre,
+      image: t.image,
+      description: t.description,
+      nom_artiste: t.User?.nom,
+      prenom_artiste: t.User?.prenom,
+    }));
+
+    return res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Erreur lors de la récupération des tatouages (public)' });
+    return res
+      .status(500)
+      .json({ message: 'Erreur lors de la récupération des tatouages (public)' });
   }
 });
 
-//  Admin : Liste complète des tatouages avec ID artiste
-router.get('/', verifyToken, isAdmin, async (req, res) => {
+/* -------- Admin : Liste complète des tatouages avec ID artiste (SQL classique) -------- */
+router.get('/', verifyToken, isAdmin, async (_req, res) => {
   try {
     const [rows] = await db.execute(`
       SELECT t.id_tatouage AS id, t.titre, t.image, t.description, 
@@ -35,16 +51,19 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-//  Admin : Détail d’un tatouage
+/* -------- Admin : Détail d’un tatouage (SQL) -------- */
 router.get('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
-    const [rows] = await db.execute(`
+    const [rows] = await db.execute(
+      `
       SELECT t.id_tatouage AS id, t.titre, t.image, t.description, t.id_utilisateur,
              u.nom AS nom_artiste, u.prenom AS prenom_artiste
       FROM tatouage t
       JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
       WHERE t.id_tatouage = ?
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     if (rows.length === 0) return res.status(404).json({ message: 'Tatouage non trouvé' });
 
@@ -54,7 +73,7 @@ router.get('/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-//  Admin : Créer un tatouage
+/* -------- Admin : Créer un tatouage (SQL) -------- */
 router.post('/', verifyToken, isAdmin, async (req, res) => {
   const { titre, image, description, id_utilisateur } = req.body;
   try {
@@ -68,7 +87,7 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-//  Admin : Modifier un tatouage
+/* -------- Admin : Modifier un tatouage (SQL) -------- */
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   const { titre, image, description, id_utilisateur } = req.body;
   try {
@@ -82,7 +101,7 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-//  Admin : Supprimer un tatouage
+/* -------- Admin : Supprimer un tatouage (SQL) -------- */
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     await db.execute('DELETE FROM tatouage WHERE id_tatouage = ?', [req.params.id]);

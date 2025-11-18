@@ -20,7 +20,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: inkmaster_db
     ports:
-      - "3307:3306"              # Accès MySQL depuis ta machine: localhost:3307
+      - "3307:3306"              # Accès MySQL depuis ma machine: localhost:3307
     volumes:
       - db_data:/var/lib/mysql
     restart: always

@@ -60,7 +60,17 @@ router.post(
         { expiresIn: '2h' }
       );
 
-      return res.json({ token, role: utilisateur.role });
+      // 5) Pose le token dans un cookie httpOnly
+      res
+        .cookie('auth_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // en prod : HTTPS obligatoire
+          sameSite: 'lax',
+          maxAge: 2 * 60 * 60 * 1000, // 2h
+        })
+        .json({
+          role: utilisateur.role, // le front n'a plus besoin du token
+        });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: 'Erreur serveur' });
@@ -68,101 +78,6 @@ router.post(
   }
 );
 
-/* -------- CRUD UTILISATEURS (admin) -------- */
-router.get('/', verifyToken, isAdmin, async (_req, res) => {
-  try {
-    const [rows] = await db.execute(
-      'SELECT id_utilisateur AS id, nom, prenom, email, role FROM utilisateur'
-    );
-    return res.json(rows);
-  } catch {
-    return res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs' });
-  }
-});
-
-router.post(
-  '/',
-  verifyToken,
-  isAdmin,
-  validate(createUserValidator),
-  sanitizeBody(['nom', 'prenom', 'email', 'role']),
-  async (req, res) => {
-    const { nom, prenom, email, password, role } = req.body;
-
-    try {
-      const hash = await bcrypt.hash(password, 10);
-      await db.execute(
-        'INSERT INTO utilisateur (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)',
-        [nom, prenom, email, hash, role]
-      );
-      return res.status(201).json({ message: 'Utilisateur créé' });
-    } catch (err) {
-      if (err?.code === 'ER_DUP_ENTRY') return res.status(409).json({ message: 'Email déjà utilisé' });
-      return res.status(500).json({ message: 'Erreur serveur lors de la création' });
-    }
-  }
-);
-
-router.get(
-  '/:id',
-  verifyToken,
-  isAdmin,
-  validate(userIdParam),
-  sanitizeParams(['id']),
-  async (req, res) => {
-    try {
-      const [rows] = await db.execute(
-        'SELECT id_utilisateur AS id, nom, prenom, email, role FROM utilisateur WHERE id_utilisateur = ?',
-        [req.params.id]
-      );
-      if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable' });
-      return res.json(rows[0]);
-    } catch {
-      return res.status(500).json({ message: 'Erreur serveur' });
-    }
-  }
-);
-
-router.put(
-  '/:id',
-  verifyToken,
-  isAdmin,
-  validate(updateUserValidator),
-  sanitizeParams(['id']),
-  sanitizeBody(['nom', 'prenom', 'email', 'role']),
-  async (req, res) => {
-    const { nom, prenom, email, role } = req.body;
-    try {
-      await db.execute(
-        'UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id_utilisateur = ?',
-        [nom, prenom, email, role, req.params.id]
-      );
-      return res.json({ message: 'Utilisateur modifié' });
-    } catch {
-      return res.status(500).json({ message: 'Erreur lors de la modification' });
-    }
-  }
-);
-
-router.delete(
-  '/:id',
-  verifyToken,
-  isAdmin,
-  validate(userIdParam),
-  sanitizeParams(['id']),
-  async (req, res) => {
-    try {
-      const [result] = await db.execute('DELETE FROM utilisateur WHERE id_utilisateur = ?', [
-        req.params.id,
-      ]);
-      if (result.affectedRows === 0)
-        return res.status(404).json({ message: 'Utilisateur introuvable' });
-      return res.json({ message: 'Utilisateur supprimé' });
-    } catch {
-      return res.status(500).json({ message: 'Erreur lors de la suppression' });
-    }
-  }
-);
 
 /* -------- TATOUAGES d’un artiste (public côté rôle) -------- */
 router.get(

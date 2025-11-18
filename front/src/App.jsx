@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
 import Navbar from "./components/Navbar/Navbar";
+import CookieBanner from "./components/CookieBanner/CookieBanner";
 import Footer from "./components/Footer/Footer";
 import "./App.css";
 
@@ -31,6 +32,8 @@ export default function App() {
   return (
     <Router>
       <Navbar />
+      <CookieBanner />   {/* bannière toujours dispo en bas de page */}
+      <Suspense fallback={<PageLoader />}></Suspense>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Artiste connecté uniquement */}

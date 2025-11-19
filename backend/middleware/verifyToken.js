@@ -1,30 +1,19 @@
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 
-export function verifyToken(req, res, next) {
-  // 1)  essaie d'abord le cookie httpOnly posé au login
-  let token = req.cookies?.auth_token;
+export const AUTH_COOKIE_NAME = 'inkmaster_token';
 
-  // 2) Fallback : ancien système "Authorization: Bearer xxx"
-  if (!token) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Token manquant' });
-    }
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return res.status(401).json({ message: 'Format de token invalide' });
-    }
-    token = parts[1];
-  }
+export function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+  const cookieToken = req.cookies?.[AUTH_COOKIE_NAME];
+  const token = bearerToken || cookieToken;
+
+  if (!token) return res.status(401).json({ message: 'Token manquant' });
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'inkmasterSecretKey'
-    );
-    // ex: { id, role }
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'inkmasterSecretKey');
+    req.user = decoded; // ex: { id, role }
     next();
   } catch (err) {
     return res.status(403).json({ message: 'Token invalide ou expiré' });

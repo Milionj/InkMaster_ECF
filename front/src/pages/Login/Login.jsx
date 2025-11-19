@@ -1,3 +1,4 @@
+// front/src/pages/Login/Login.jsx
 import { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,18 +9,21 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Login() {
   const { login } = useUser();
+  // États pour stocker les champs du formulaire
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
 
+  // États pour les messages d’erreur
   const [erreur, setErreur] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
+  // Ref pour pouvoir reset le reCAPTCHA après soumission
   const recaptchaRef = useRef(null);
   const navigate = useNavigate();
 
-  // Vérification email
+  // Fonction pour vérifier que l’email est valide
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -32,15 +36,17 @@ export default function Login() {
     return regex.test(password);
   };
 
+  // Fonction déclenchée lors de la soumission du formulaire
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErreur("");
 
+    // Si le reCAPTCHA n’a pas été validé, on empêche l’envoi
     if (!captchaToken) {
       setErreur("Veuillez valider le reCAPTCHA.");
       return;
     }
 
+    // Vérification du format de l’email
     if (!validateEmail(email)) {
       setEmailError("Format d'email invalide.");
       return;
@@ -48,6 +54,7 @@ export default function Login() {
       setEmailError("");
     }
 
+    // Vérification du format du mot de passe
     if (!validatePassword(password)) {
       setPasswordError(
         "Mot de passe invalide : minimum 12 caractères avec majuscule, minuscule, chiffre et caractère spécial."
@@ -57,9 +64,11 @@ export default function Login() {
       setPasswordError("");
     }
 
+    // Affiche le token reCAPTCHA dans la console pour le debug
     console.log("Token captcha envoyé au backend :", captchaToken);
 
     try {
+      // Envoie des données de connexion + token captcha au backend
       const res = await axios.post(
         "http://localhost:5000/api/utilisateurs/login",
         {
@@ -67,31 +76,29 @@ export default function Login() {
           password,
           captchaToken,
         },
-        {
-          withCredentials: true, // IMPORTANT pour recevoir le cookie httpOnly
-        }
+        { withCredentials: true }
       );
 
-      // Le backend renvoie seulement le rôle (le token est dans le cookie)
-      const { role } = res.data;
+      // Si la connexion réussit, le backend dépose un cookie httpOnly : on stocke le profil dans le contexte
+      const { user } = res.data;
 
-      // Optionnel : login Firebase si je veux synchroniser
+      // Connexion à Firebase Auth (optionnel, commenté pour l’instant)
       // const firebaseAuth = getAuth();
       // await signInWithEmailAndPassword(firebaseAuth, email, password);
 
-      // On met à jour le contexte (pas de token côté front)
-      login(role);
+      login(user);
 
       // Redirection selon le rôle
-      if (role === "admin") {
+      if (user.role === "admin") {
         navigate("/dashboard");
-      } else if (role === "artiste") {
+      } else if (user.role === "artiste") {
         navigate("/");
       } else {
         setErreur("Rôle inconnu.");
       }
     } catch (err) {
       console.error(err);
+      // Si c’est une erreur liée au captcha, on affiche un message spécifique
       if (err.response?.data?.message === "Captcha invalide") {
         setErreur("Captcha invalide. Merci de cocher à nouveau.");
       } else {
@@ -99,9 +106,10 @@ export default function Login() {
       }
     }
 
+    // On reset le reCAPTCHA pour permettre une nouvelle tentative
     if (recaptchaRef.current) {
       recaptchaRef.current.reset();
-      setCaptchaToken("");
+      setCaptchaToken(""); // On remet l’état à vide
     }
   };
 
@@ -130,6 +138,7 @@ export default function Login() {
         />
         {passwordError && <p className="error-msg">{passwordError}</p>}
 
+        {/* Composant reCAPTCHA : on récupère le token dès que l’utilisateur coche la case */}
         <ReCAPTCHA
           sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
           onChange={(token) => {
@@ -141,6 +150,7 @@ export default function Login() {
 
         <button type="submit">Connexion</button>
 
+        {/* Affichage d’un message d’erreur global si besoin */}
         {erreur && <p className="error-msg">{erreur}</p>}
       </form>
     </div>

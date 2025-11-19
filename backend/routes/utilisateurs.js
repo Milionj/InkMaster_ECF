@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 
-import { verifyToken, isAdmin, validate } from '../middleware/verifyToken.js';
+import { verifyToken, isAdmin, validate, AUTH_COOKIE_NAME } from '../middleware/verifyToken.js';
 import { sanitizeBody, sanitizeParams } from '../middleware/sanitize.js';
 
 import { loginValidator } from '../validators/auth.validators.js';
@@ -15,6 +15,22 @@ import {
 } from '../validators/user.validators.js';
 
 const router = express.Router();
+
+const cookieBaseOptions = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+};
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 2;
+
+const formatUserResponse = (utilisateur) => ({
+  id: utilisateur.id_utilisateur ?? utilisateur.id,
+  nom: utilisateur.nom,
+  prenom: utilisateur.prenom,
+  email: utilisateur.email,
+  role: utilisateur.role,
+});
 
 /* -------- reCAPTCHA -------- */
 const verifyCaptcha = async (token) => {
@@ -60,17 +76,15 @@ router.post(
         { expiresIn: '2h' }
       );
 
-      // 5) Pose le token dans un cookie httpOnly
-      res
-        .cookie('auth_token', token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production', // en prod : HTTPS obligatoire
-          sameSite: 'lax',
-          maxAge: 2 * 60 * 60 * 1000, // 2h
-        })
-        .json({
-          role: utilisateur.role, // le front n'a plus besoin du token
-        });
+      res.cookie(AUTH_COOKIE_NAME, token, {
+        ...cookieBaseOptions,
+        maxAge: COOKIE_MAX_AGE,
+      });
+
+      return res.json({
+        message: 'Connexion réussie',
+        user: formatUserResponse(utilisateur),
+      });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: 'Erreur serveur' });
@@ -78,6 +92,121 @@ router.post(
   }
 );
 
+/* -------- LOGOUT -------- */
+router.post('/logout', (_req, res) => {
+  res.clearCookie(AUTH_COOKIE_NAME, cookieBaseOptions);
+  return res.json({ message: 'Déconnexion réussie' });
+});
+
+/* -------- ME : n’expose le profil qu’après vérification du token -------- */
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT id_utilisateur, nom, prenom, email, role FROM utilisateur WHERE id_utilisateur = ?',
+      [req.user.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable' });
+    return res.json(formatUserResponse(rows[0]));
+  } catch {
+    return res.status(500).json({ message: 'Erreur lors de la récupération du profil' });
+  }
+});
+
+/* -------- CRUD UTILISATEURS (admin) -------- */
+router.get('/', verifyToken, isAdmin, async (_req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT id_utilisateur AS id, nom, prenom, email, role FROM utilisateur'
+    );
+    return res.json(rows);
+  } catch {
+    return res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs' });
+  }
+});
+
+router.post(
+  '/',
+  verifyToken,
+  isAdmin,
+  validate(createUserValidator),
+  sanitizeBody(['nom', 'prenom', 'email', 'role']),
+  async (req, res) => {
+    const { nom, prenom, email, password, role } = req.body;
+
+    try {
+      const hash = await bcrypt.hash(password, 10);
+      await db.execute(
+        'INSERT INTO utilisateur (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)',
+        [nom, prenom, email, hash, role]
+      );
+      return res.status(201).json({ message: 'Utilisateur créé' });
+    } catch (err) {
+      if (err?.code === 'ER_DUP_ENTRY') return res.status(409).json({ message: 'Email déjà utilisé' });
+      return res.status(500).json({ message: 'Erreur serveur lors de la création' });
+    }
+  }
+);
+
+router.get(
+  '/:id',
+  verifyToken,
+  isAdmin,
+  validate(userIdParam),
+  sanitizeParams(['id']),
+  async (req, res) => {
+    try {
+      const [rows] = await db.execute(
+        'SELECT id_utilisateur AS id, nom, prenom, email, role FROM utilisateur WHERE id_utilisateur = ?',
+        [req.params.id]
+      );
+      if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable' });
+      return res.json(rows[0]);
+    } catch {
+      return res.status(500).json({ message: 'Erreur serveur' });
+    }
+  }
+);
+
+router.put(
+  '/:id',
+  verifyToken,
+  isAdmin,
+  validate(updateUserValidator),
+  sanitizeParams(['id']),
+  sanitizeBody(['nom', 'prenom', 'email', 'role']),
+  async (req, res) => {
+    const { nom, prenom, email, role } = req.body;
+    try {
+      await db.execute(
+        'UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id_utilisateur = ?',
+        [nom, prenom, email, role, req.params.id]
+      );
+      return res.json({ message: 'Utilisateur modifié' });
+    } catch {
+      return res.status(500).json({ message: 'Erreur lors de la modification' });
+    }
+  }
+);
+
+router.delete(
+  '/:id',
+  verifyToken,
+  isAdmin,
+  validate(userIdParam),
+  sanitizeParams(['id']),
+  async (req, res) => {
+    try {
+      const [result] = await db.execute('DELETE FROM utilisateur WHERE id_utilisateur = ?', [
+        req.params.id,
+      ]);
+      if (result.affectedRows === 0)
+        return res.status(404).json({ message: 'Utilisateur introuvable' });
+      return res.json({ message: 'Utilisateur supprimé' });
+    } catch {
+      return res.status(500).json({ message: 'Erreur lors de la suppression' });
+    }
+  }
+);
 
 /* -------- TATOUAGES d’un artiste (public côté rôle) -------- */
 router.get(

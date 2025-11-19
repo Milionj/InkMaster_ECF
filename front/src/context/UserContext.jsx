@@ -1,55 +1,57 @@
-import { createContext, useState, useEffect, useContext  } from "react";
-
-//création du contexte utilisateur qui peut etre importé ailleurs
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
 export const UserContext = createContext();
 
-//composant qui fourni le contexte a toute l'application
-
 export const UserProvider = ({ children }) => {
-    //etat local pour stocker le token JWT et le role de l'utilisateur 
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const [token, setToken] = useState(localStorage.getItem('token') || null);
-    const [role, setRole] = useState(localStorage.getItem('role') || null); 
+  const fetchProfile = useCallback(async () => {
+    try {
+      const { data } = await axios.get('http://localhost:5000/api/utilisateurs/me');
+      setUser(data);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    // fonction appelée lors de la connexion pour mettre a jour l'état + localStorage
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
-    const login = (newToken, newRole) => {
-        setToken(newToken);
-        setRole(newRole);
-        localStorage.setItem('token', newToken);
-        localStorage.setItem('role', newRole);
-    };
+  const login = (userData) => {
+    setUser(userData);
+    setLoading(false);
+  };
 
-    // fonction appelé pour deconnecter l'utilisateur
+  const logout = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/utilisateurs/logout');
+    } catch {
+      // Ignore réseau pour l'UX
+    } finally {
+      setUser(null);
+    }
+  };
 
-    const logout = () => {
-        setToken(null);
-        setRole(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-    };
-
-    //Au changement du composant : récupere les données du localStorage
-    //(utile en cas de rafraichissement de la page ou navigateur)
-
-    useEffect(() =>{
-        const savedToken = localStorage.getItem('token');
-        const savedRole = localStorage.getItem('role');
-        if (savedToken && savedRole) {
-            setToken(savedToken);
-            setRole(savedRole);
-        }
-    }, []);
-
-    //on rend accessible le token, le role et les fonctions login/logout a toute l'app
-    return (
-        <UserContext.Provider value = {{ token, role, login, logout }}>
-        {children}
-        </UserContext.Provider>
-    );
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        role: user?.role ?? null,
+        isAuthenticated: Boolean(user),
+        login,
+        logout,
+        refresh: fetchProfile,
+        loading,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
 };
 
-export const useUser = () => {
-  return useContext(UserContext);
-};
+export const useUser = () => useContext(UserContext);

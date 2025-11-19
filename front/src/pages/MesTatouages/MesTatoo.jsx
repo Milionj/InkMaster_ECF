@@ -7,38 +7,29 @@ import React, { useEffect, useState } from "react";
 // -----
 import axios from "axios"; 
 //Pour appeler les API backend : AXIOS
-import { useUser } from "../../context/UserContext"; //Pour récupérer les Token JWT
-import { jwtDecode } from "jwt-decode";
- //Pour décoder le Token JWT
+import { useUser } from "../../context/UserContext";
 import "./MesTatoo.css"; 
 
 export default function MesTatouages() {
   const [tatouages, setTatouages] = useState([]); // Stockage local des tatouages de l'artiste
   const [loading, setLoading] = useState(true); // État pour afficher un message pendant le chargement
-  const { token } = useUser(); // Récupération du Token depuis le context utilisateur
+  const { user, loading: userLoading } = useUser();
 
   // pagination
   const itemsPerPage = 3;
   const [page, setPage] = useState(1);
 
-  // Fonction pour décoder le token JWT et obtenir l'id_utilisateur
-const getUserIdFromToken = () => {
-  try {
-    const decoded = jwtDecode(token);
-    return decoded.id;
-  } catch (error) {
-    console.error("Erreur de décodage du token :", error);
-    return null;
-  }
-};
-
   // Récupérer les tatouages associés à l'artiste connecté
   const fetchTatouages = async () => {
-    const userId = getUserIdFromToken(); // On récupère l'id utilisateur depuis le token
-    if (!userId) return; // Si pas d'id, on arrête ici
+    setLoading(true);
+    if (!user?.id) {
+      setLoading(false);
+      setTatouages([]);
+      return;
+    }
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/utilisateurs/${userId}/tatouages`);
+      const res = await axios.get(`http://localhost:5000/api/utilisateurs/${user.id}/tatouages`);
       setTatouages(res.data); // On stocke les tatouages reçus
     } catch (err) {
       console.error("Erreur lors du chargement des tatouages :", err);
@@ -49,8 +40,9 @@ const getUserIdFromToken = () => {
 
   // Chargement de tatouages dès le chargement de la page
   useEffect(() => {
+    if (userLoading) return;
     fetchTatouages();
-  }, []);
+  }, [user, userLoading]);
 
   // pagination : calcul des éléments affichés sur la page courante
   const totalPages = Math.ceil(tatouages.length / itemsPerPage);
@@ -61,7 +53,7 @@ const getUserIdFromToken = () => {
     <div className="mes-tatouages-container">
       <h1>Mes Tatouages</h1>
 
-      {loading ? (
+      {loading || userLoading ? (
         <p>Chargement en cours...</p>
       ) : tatouages.length === 0 ? (
         <p>Vous n’avez encore publié aucun tatouage.</p>

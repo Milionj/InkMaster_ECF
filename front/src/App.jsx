@@ -4,6 +4,7 @@ import { lazy, Suspense } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import CookieBanner from "./components/CookieBanner/CookieBanner";
 import Footer from "./components/Footer/Footer";
+import CookieBanner from "./components/CookieBanner/CookieBanner";
 import "./App.css";
 
 // --- Lazy load pages (un fichier = un chunk) ---
@@ -77,6 +78,7 @@ export default function App() {
           />
         </Routes>
       </Suspense>
+      <CookieBanner />
       <Footer />
     </Router>
   );

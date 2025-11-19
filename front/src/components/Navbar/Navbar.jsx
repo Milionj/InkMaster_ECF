@@ -6,7 +6,7 @@ import './Navbar.css';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false); // État du menu burger
-  const { token, role, logout } = useUser(); // Données du contexte utilisateur
+  const { isAuthenticated, role, logout } = useUser(); // Données du contexte utilisateur
   const location = useLocation();
 
   // Ouvre/ferme le menu burger
@@ -41,14 +41,14 @@ function Navbar() {
           <Link to="/contact" onClick={toggleBurger}>Contact</Link>
 
           {/* 🔹 PUBLIC : bouton "prendre rendez-vous" uniquement si NON connecté */}
-          {!token && (
+          {!isAuthenticated && (
             <Link to="/rendez-vous" onClick={toggleBurger}>
               prendre <strong>rendez-vous</strong>
             </Link>
           )}
 
           {/* Si connecté */}
-          {token ? (
+          {isAuthenticated ? (
             <>
               {/* Affiche le rôle de l’utilisateur (admin ou artiste) */}
               <span className="user-role">Connecté : {role}</span>
@@ -83,8 +83,8 @@ function Navbar() {
               {/* Bouton de déconnexion */}
               <button
                 className="logout-btn"
-                onClick={() => {
-                  logout();
+                onClick={async () => {
+                  await logout();
                   toggleBurger();
                 }}
               >

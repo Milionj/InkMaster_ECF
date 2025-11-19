@@ -6,7 +6,7 @@ import { useUser } from "../../context/UserContext";
 import "./RendezVousGestion.css";
 
 export default function RendezVousGestion() {
-  const { role } = useUser();
+  const { role, loading: userLoading } = useUser();
   const navigate = useNavigate();
 
   const [rdvList, setRdvList] = useState([]);
@@ -16,10 +16,11 @@ export default function RendezVousGestion() {
 
   // Protection : seulement artiste + admin
   useEffect(() => {
+    if (userLoading) return;
     if (role !== "artiste" && role !== "admin") {
       navigate("/login");
     }
-  }, [role, navigate]);
+  }, [role, userLoading, navigate]);
 
   // Récupération des rendez-vous depuis Firestore
   useEffect(() => {

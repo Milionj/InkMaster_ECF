@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import db from './db.js';
 import cookieParser from 'cookie-parser';
 import avisRouter from './routes/avis.route.js';
@@ -43,6 +44,19 @@ app.use(cookieParser());
 
 // Pour lire le JSON
 app.use(express.json());
+app.use(cookieParser());
+const cspDirectives = [
+  "default-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+].join('; ');
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', cspDirectives);
+  next();
+});
 
 // Routes
 app.use('/api/utilisateurs', utilisateurRoutes);

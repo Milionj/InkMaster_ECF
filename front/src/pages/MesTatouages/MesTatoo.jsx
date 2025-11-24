@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 // -----
 import axios from "axios"; 
 //Pour appeler les API backend : AXIOS
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../Context/UserContext";
 import "./MesTatoo.css"; 
 
 export default function MesTatouages() {
@@ -88,3 +88,4 @@ export default function MesTatouages() {
     </div>
   );
 }
+

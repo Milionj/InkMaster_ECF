@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebase"; // même chemin que dans RendezVousForm
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../Context/UserContext";
 import "./RendezVousGestion.css";
 
 export default function RendezVousGestion() {
@@ -172,3 +172,4 @@ export default function RendezVousGestion() {
     </section>
   );
 }
+

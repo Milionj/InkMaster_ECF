@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../Context/UserContext";
 import "./Login.css";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
@@ -156,3 +156,4 @@ export default function Login() {
     </div>
   );
 }
+

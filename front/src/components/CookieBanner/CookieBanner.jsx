@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useCookieConsent } from '../../context/CookieConsentContext';
+import { useCookieConsent } from '../../Context/CookieConsentContext';
 import './CookieBanner.css';
 
 export default function CookieBanner() {
@@ -23,3 +23,4 @@ export default function CookieBanner() {
     </div>
   );
 }
+

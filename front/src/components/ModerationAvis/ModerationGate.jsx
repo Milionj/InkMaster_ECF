@@ -1,4 +1,4 @@
-import { useUser } from '../../context/UserContext';
+import { useUser } from '../../Context/UserContext';
 import { Navigate } from 'react-router-dom';
 import ModerationAvis from './ModerationAvis';
 
@@ -11,3 +11,4 @@ export default function ModerationGate() {
 
   return <Navigate to="/" />;
 }
+

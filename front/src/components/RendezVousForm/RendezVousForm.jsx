@@ -1,7 +1,13 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { db } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import "./RendezVousForm.css";
+
+const MAX_NAME = 100;
+const MAX_EMAIL = 120;
+const MAX_PHONE = 20;
+const MAX_MESSAGE = 1200;
+const MIN_MESSAGE = 10;
 
 export default function RendezVousForm() {
   const [formData, setFormData] = useState({
@@ -16,11 +22,8 @@ export default function RendezVousForm() {
   const [confirmation, setConfirmation] = useState("");
   const [erreur, setErreur] = useState("");
 
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-
-  const validatePhone = (phone) =>
-    /^(\+33|0)[1-9](\d{2}){4}$/.test(phone.trim());
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const validatePhone = (phone) => phone.trim() === "" || /^(\+33|0)[1-9](\d{2}){4}$/.test(phone.trim());
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,32 +34,43 @@ export default function RendezVousForm() {
     setErreur("");
     setConfirmation("");
 
-    const { nom, email, telephone, date, heure, message } = formData;
+    const nomTrim = formData.nom.trim();
+    const emailTrim = formData.email.trim();
+    const telTrim = formData.telephone.trim();
+    const messageTrim = formData.message.trim();
 
-    if (!nom || !email || !date || !heure) {
+    if (!nomTrim || !emailTrim || !formData.date || !formData.heure) {
       return setErreur("Les champs avec * sont obligatoires.");
     }
 
-    if (!validateEmail(email)) {
-      return setErreur("Email invalide.");
+    if (nomTrim.length > MAX_NAME) {
+      return setErreur("Nom trop long.");
     }
 
-    if (telephone && !validatePhone(telephone)) {
+    if (!validateEmail(emailTrim) || emailTrim.length > MAX_EMAIL) {
+      return setErreur("Email invalide ou trop long.");
+    }
+
+    if (!validatePhone(telTrim) || telTrim.length > MAX_PHONE) {
       return setErreur("Téléphone invalide (format FR).");
+    }
+
+    if (messageTrim && (messageTrim.length < MIN_MESSAGE || messageTrim.length > MAX_MESSAGE)) {
+      return setErreur(`Le message doit contenir entre ${MIN_MESSAGE} et ${MAX_MESSAGE} caractères.`);
     }
 
     try {
       await addDoc(collection(db, "rendez_vous"), {
-        nom: nom.trim(),
-        email: email.trim(),
-        telephone: telephone.trim(),
-        date,
-        heure,
-        message: message.trim(),
+        nom: nomTrim,
+        email: emailTrim,
+        telephone: telTrim,
+        date: formData.date,
+        heure: formData.heure,
+        message: messageTrim,
         timestamp: serverTimestamp(),
       });
 
-      setConfirmation("✅ Rendez-vous enregistré !");
+      setConfirmation("Rendez-vous enregistré !");
       setFormData({
         nom: "",
         email: "",
@@ -67,20 +81,48 @@ export default function RendezVousForm() {
       });
     } catch (err) {
       console.error(err);
-      setErreur("❌ Une erreur est survenue.");
+      setErreur("Une erreur est survenue.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rendezvous-form">
+    <form onSubmit={handleSubmit} className="rendezvous-form" noValidate>
       <h2>Prendre un rendez-vous</h2>
 
-      <input name="nom" placeholder="Votre nom *" value={formData.nom} onChange={handleChange} />
-      <input name="email" placeholder="Votre email *" value={formData.email} onChange={handleChange} />
-      <input name="telephone" placeholder="Téléphone (FR)" value={formData.telephone} onChange={handleChange} />
-      <input type="date" name="date" value={formData.date} onChange={handleChange} />
-      <input type="time" name="heure" value={formData.heure} onChange={handleChange} />
-      <textarea name="message" placeholder="Décrivez votre projet de tatouage" value={formData.message} onChange={handleChange} />
+      <input
+        name="nom"
+        placeholder="Votre nom *"
+        value={formData.nom}
+        maxLength={MAX_NAME}
+        onChange={handleChange}
+        required
+      />
+      <input
+        name="email"
+        type="email"
+        placeholder="Votre email *"
+        value={formData.email}
+        maxLength={MAX_EMAIL}
+        onChange={handleChange}
+        required
+      />
+      <input
+        name="telephone"
+        placeholder="Téléphone (FR)"
+        value={formData.telephone}
+        maxLength={MAX_PHONE}
+        onChange={handleChange}
+      />
+      <input type="date" name="date" value={formData.date} onChange={handleChange} required />
+      <input type="time" name="heure" value={formData.heure} onChange={handleChange} required />
+      <textarea
+        name="message"
+        placeholder="Décrivez votre projet de tatouage"
+        value={formData.message}
+        minLength={MIN_MESSAGE}
+        maxLength={MAX_MESSAGE}
+        onChange={handleChange}
+      />
 
       <button type="submit">Envoyer</button>
 

@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 
-import { verifyToken, isAdmin, validate } from '../middleware/verifyToken.js';
+import { verifyToken, isAdmin, validate, AUTH_COOKIE_NAME } from '../middleware/verifyToken.js';
 import { sanitizeBody, sanitizeParams } from '../middleware/sanitize.js';
 
 import { loginValidator } from '../validators/auth.validators.js';
@@ -15,6 +15,22 @@ import {
 } from '../validators/user.validators.js';
 
 const router = express.Router();
+
+const cookieBaseOptions = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+};
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 2;
+
+const formatUserResponse = (utilisateur) => ({
+  id: utilisateur.id_utilisateur ?? utilisateur.id,
+  nom: utilisateur.nom,
+  prenom: utilisateur.prenom,
+  email: utilisateur.email,
+  role: utilisateur.role,
+});
 
 /* -------- reCAPTCHA -------- */
 const verifyCaptcha = async (token) => {
@@ -60,13 +76,41 @@ router.post(
         { expiresIn: '2h' }
       );
 
-      return res.json({ token, role: utilisateur.role });
+      res.cookie(AUTH_COOKIE_NAME, token, {
+        ...cookieBaseOptions,
+        maxAge: COOKIE_MAX_AGE,
+      });
+
+      return res.json({
+        message: 'Connexion réussie',
+        user: formatUserResponse(utilisateur),
+      });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: 'Erreur serveur' });
     }
   }
 );
+
+/* -------- LOGOUT -------- */
+router.post('/logout', (_req, res) => {
+  res.clearCookie(AUTH_COOKIE_NAME, cookieBaseOptions);
+  return res.json({ message: 'Déconnexion réussie' });
+});
+
+/* -------- ME : n’expose le profil qu’après vérification du token -------- */
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT id_utilisateur, nom, prenom, email, role FROM utilisateur WHERE id_utilisateur = ?',
+      [req.user.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable' });
+    return res.json(formatUserResponse(rows[0]));
+  } catch {
+    return res.status(500).json({ message: 'Erreur lors de la récupération du profil' });
+  }
+});
 
 /* -------- CRUD UTILISATEURS (admin) -------- */
 router.get('/', verifyToken, isAdmin, async (_req, res) => {

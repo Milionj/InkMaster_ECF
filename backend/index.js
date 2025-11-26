@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import db from './db.js';
-
+import { getContentSecurityPolicy } from './security/csp.js';
 import avisRouter from './routes/avis.route.js';
 import utilisateurRoutes from './routes/utilisateurs.js';
 import tatouageRoutes from './routes/tatouage.route.js';
@@ -32,17 +33,25 @@ const corsOptions = {
       : callback(new Error(`CORS not allowed: ${origin}`));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true,
+  credentials: true,   //  important pour les cookies
 };
 
 app.use(cors(corsOptions));
-// app.options('*', cors(corsOptions));
-app.options(/.*/, cors(corsOptions)); //Express 5
+app.options(/.*/, cors(corsOptions)); // Express 5
 
+// cookie-parser AVANT les routes
+app.use(cookieParser());
 
-
+// Pour lire le JSON
 app.use(express.json());
 
+// csp 
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', getContentSecurityPolicy());
+  next();
+});
+
+// Routes
 app.use('/api/utilisateurs', utilisateurRoutes);
 app.use('/api/tatouages', tatouageRoutes);
 app.use('/api/services', serviceRoutes);

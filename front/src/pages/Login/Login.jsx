@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../Context/UserContext";
 import "./Login.css";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
@@ -53,7 +53,7 @@ export default function Login() {
     } else {
       setEmailError("");
     }
-
+    
     // Vérification du format du mot de passe
     if (!validatePassword(password)) {
       setPasswordError(
@@ -75,22 +75,23 @@ export default function Login() {
           email,
           password,
           captchaToken,
-        }
+        },
+        { withCredentials: true }
       );
 
-      // Si la connexion réussit, on stocke le token JWT et le rôle dans le localStorage
-      const { token, role } = res.data;
+      // Si la connexion réussit, le backend dépose un cookie httpOnly : on stocke le profil dans le contexte
+      const { user } = res.data;
 
       // Connexion à Firebase Auth (optionnel, commenté pour l’instant)
       // const firebaseAuth = getAuth();
       // await signInWithEmailAndPassword(firebaseAuth, email, password);
 
-      login(token, role);
+      login(user);
 
       // Redirection selon le rôle
-      if (role === "admin") {
+      if (user.role === "admin") {
         navigate("/dashboard");
-      } else if (role === "artiste") {
+      } else if (user.role === "artiste") {
         navigate("/");
       } else {
         setErreur("Rôle inconnu.");
@@ -155,3 +156,4 @@ export default function Login() {
     </div>
   );
 }
+

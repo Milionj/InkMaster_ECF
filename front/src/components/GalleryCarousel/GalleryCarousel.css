@@ -1,4 +1,4 @@
-/* GLOBAL */
+﻿/* GLOBAL */
 body {
   background-color: #E5E5E5;
   margin: 0;
@@ -62,7 +62,7 @@ body {
 /* GALLERY CAROUSEL */
 .carousel-section {
   width: 100%;
-  max-width: none; /* Supprime la limite à 1400px */
+  max-width: none; /* no 1400px limit */
   padding: 3rem 2rem;
   background-color: #fff;
   text-align: center;
@@ -70,22 +70,20 @@ body {
 
 .image-wrapper {
   width: 100%;
-  height: 400px; /* Taille du bloc image */
+  height: 400px; /* image block height */
   display: flex;
   justify-content: center;
   align-items: center;
-  background: white; /* ou #fff */
+  background: white;
 }
-
 
 .image-wrapper img {
   max-height: 100%;
   max-width: 100%;
-  object-fit: contain; /* Ne coupe pas l’image */
+  object-fit: contain; /* do not crop image */
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-
 
 .cards {
   display: flex;
@@ -112,8 +110,6 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* Les images du carrousel */
-
 .cards article img {
   width: 100%;
   height: 100%;
@@ -126,10 +122,6 @@ body {
   height: 100%;
   object-fit: cover;
 }
-
-
-
-
 
 /* TEXT PREVIEW */
 .article-preview h2 {
@@ -213,7 +205,7 @@ select {
   flex-direction: column;
   justify-content: center;
   gap: 1.5rem;
-  height: 400px; /* Même hauteur que la carte */
+  height: 400px; /* same height as map */
   box-sizing: border-box;
 }
 
@@ -346,9 +338,30 @@ select {
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
+  .location-section {
+    padding: 32px 16px;
+  }
+
   .location-content {
     flex-direction: column;
     align-items: center;
+    gap: 16px;
+  }
+
+  .location-map-container,
+  .location-info {
+    width: 100%;
+    max-width: 320px;
+    min-width: 0;
+  }
+
+  .location-map {
+    height: 280px;
+  }
+
+  .location-info {
+    height: auto;
+    padding: 1rem;
   }
 
   .hero-section h1 {
@@ -366,6 +379,6 @@ select {
   }
 
   .cards article img {
-    height: 300px; /* Hauteur réduite sur mobile */
+    height: 300px; /* reduced height on mobile */
   }
 }

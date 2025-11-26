@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebase"; // même chemin que dans RendezVousForm
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../Context/UserContext";
 import "./RendezVousGestion.css";
 
 export default function RendezVousGestion() {
-  const { role } = useUser();
+  const { role, loading: userLoading } = useUser();
   const navigate = useNavigate();
 
   const [rdvList, setRdvList] = useState([]);
@@ -16,10 +16,11 @@ export default function RendezVousGestion() {
 
   // Protection : seulement artiste + admin
   useEffect(() => {
+    if (userLoading) return;
     if (role !== "artiste" && role !== "admin") {
       navigate("/login");
     }
-  }, [role, navigate]);
+  }, [role, userLoading, navigate]);
 
   // Récupération des rendez-vous depuis Firestore
   useEffect(() => {
@@ -171,3 +172,4 @@ export default function RendezVousGestion() {
     </section>
   );
 }
+

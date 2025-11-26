@@ -50,10 +50,9 @@ export default function Confidentialite() {
         via le formulaire de contact ou par e-mail à <strong>contact@inkmaster.fr</strong>.
       </p>
 
-      <h2>ARTICLE 7 : Cookies</h2>
+      <h2>ARTICLE 7 : Cookies & droit à l'oubli</h2>
       <p>
-        Le site InkMaster utilise des cookies afin d’améliorer l’expérience utilisateur et de mesurer la fréquentation.
-        Vous pouvez à tout moment refuser ou supprimer les cookies via les paramètres de votre navigateur.
+        Le site InkMaster utilise un cookie strictement nécessaire pour mémoriser votre consentement et, uniquement après votre accord, des cookies de mesure d’audience. Conformément au droit à l’oubli et au RGPD, vous pouvez retirer votre consentement ou demander la suppression de vos données personnelles (rendez-vous, avis, informations de compte) à tout moment. Pour exercer ces droits, contactez-nous via le formulaire de contact ou à <strong>contact@inkmaster.fr</strong>; nous supprimerons alors vos données et désactiverons les éventuels cookies associés dans les meilleurs délais.
       </p>
 
       <h2>ARTICLE 8 : Droit applicable</h2>

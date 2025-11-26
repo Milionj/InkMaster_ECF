@@ -1,6 +1,52 @@
-# .gitignore
+# =========================
+# Dépendances & builds
+# =========================
 node_modules/
-.env
-/dist
+dist/
+dist-ssr/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# Fichiers locaux / config
+# =========================
+*.local
+
+# =========================
+# Éditeurs / OS
+# =========================
 .vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =========================
+# Fichiers sensibles (env)
+# =========================
+.env
+.env.local
+.env.*
+*.env
+
+backend/.env
+backend/.env.local
+
+# =========================
+# Secrets & scripts internes
+# =========================
 backend/serviceAccountKey.json
+backend/scripts/reset-passwords.mjs

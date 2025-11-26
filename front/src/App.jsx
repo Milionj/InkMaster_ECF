@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
+import CookieBanner from "./components/CookieBanner/CookieBanner";
 import "./App.css";
 
 // --- Lazy load pages (un fichier = un chunk) ---
@@ -31,6 +32,8 @@ export default function App() {
   return (
     <Router>
       <Navbar />
+      <CookieBanner />   {/* bannière toujours dispo en bas de page */}
+      <Suspense fallback={<PageLoader />}></Suspense>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Artiste connecté uniquement */}
@@ -74,6 +77,7 @@ export default function App() {
           />
         </Routes>
       </Suspense>
+      <CookieBanner />
       <Footer />
     </Router>
   );

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
+import { useUser } from '../../Context/UserContext';
 
 import './Navbar.css';
 
 function Navbar() {
-  const [isOpen, setIsOpen] = useState(false); // État du menu burger
-  const { token, role, logout } = useUser(); // Données du contexte utilisateur
+  const [isOpen, setIsOpen] = useState(false); // �tat du menu burger
+  const { isAuthenticated, role, logout } = useUser(); // Donn�es du contexte utilisateur
   const location = useLocation();
 
   // Ouvre/ferme le menu burger
@@ -14,14 +14,14 @@ function Navbar() {
     setIsOpen(!isOpen);
   };
 
-  // Ferme le menu burger à chaque changement de route
+  // Ferme le menu burger � chaque changement de route
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
 
   return (
     <>
-      {/* Overlay sombre en arrière-plan quand le menu est ouvert (mobile) */}
+      {/* Overlay sombre en arri�re-plan quand le menu est ouvert (mobile) */}
       {isOpen && <div className="overlay" onClick={toggleBurger}></div>}
 
       {/* Barre de navigation principale */}
@@ -40,17 +40,17 @@ function Navbar() {
           <Link to="/artistes" onClick={toggleBurger}>Artistes</Link>
           <Link to="/contact" onClick={toggleBurger}>Contact</Link>
 
-          {/* 🔹 PUBLIC : bouton "prendre rendez-vous" uniquement si NON connecté */}
-          {!token && (
+          {/* PUBLIC : bouton "prendre rendez-vous" uniquement si NON connect� */}
+          {!isAuthenticated && (
             <Link to="/rendez-vous" onClick={toggleBurger}>
               prendre <strong>rendez-vous</strong>
             </Link>
           )}
 
-          {/* Si connecté */}
-          {token ? (
+          {/* Si connect� */}
+          {isAuthenticated ? (
             <>
-              {/* Affiche le rôle de l’utilisateur (admin ou artiste) */}
+              {/* Affiche le r�le de l�utilisateur (admin ou artiste) */}
               <span className="user-role">Connecté : {role}</span>
 
               {/* Lien admin visible uniquement pour les admins */}
@@ -60,7 +60,7 @@ function Navbar() {
                 </Link>
               )}
 
-              {/* Lien artiste spécifique */}
+              {/* Lien artiste sp�cifique */}
               {role === 'artiste' && (
                 <Link to="/mes-tatouages" onClick={toggleBurger}>
                   Mes tatouages
@@ -69,22 +69,22 @@ function Navbar() {
 
               {role === 'artiste' && (
                 <Link to="/moderation" onClick={toggleBurger}>
-                  Modérer les avis
+                  Modèrer les avis
                 </Link>
               )}
 
-              {/* 🔹 CONNECTÉ (admin ou artiste) : "Gérer les rendez-vous" */}
+              {/* CONNECT� (admin ou artiste) : "G�rer les rendez-vous" */}
               {(role === 'artiste' || role === 'admin') && (
                 <Link to="/gestion-rendez-vous" onClick={toggleBurger}>
                   Gérer les rendez-vous
                 </Link>
               )}
 
-              {/* Bouton de déconnexion */}
+              {/* Bouton de d�connexion */}
               <button
                 className="logout-btn"
-                onClick={() => {
-                  logout();
+                onClick={async () => {
+                  await logout();
                   toggleBurger();
                 }}
               >

@@ -1,4 +1,4 @@
-/* Général */
+﻿/* General */
 body {
     background-color: #E5E5E5;
     margin: 0;
@@ -13,7 +13,6 @@ body {
     padding: 80px 40px 0 40px;
     box-sizing: border-box;
 }
-
 
 /* Hero Section */
 .hero-section {
@@ -42,7 +41,6 @@ body {
     margin-top: 20px;
 }
 
-
 /* Presentation Section */
 .presentation-section {
     text-align: center;
@@ -63,7 +61,6 @@ body {
 }
 
 /* GalleryCarousel : ajouter si besoin */
-
 .gallery-carousel img {
     width: 100%;
     max-width: 300px;
@@ -93,9 +90,9 @@ body {
 
 .location-map-container,
 .location-info {
-    flex: 0 1 500px; /* Même largeur que la carte (500px) */
+    flex: 0 1 500px; /* Meme largeur que la carte (500px) */
     min-width: 300px;
-    max-width: 500px; /* Limite haute pour garder cohérence */
+    max-width: 500px; /* Limite haute pour garder coherence */
 }
 
 .location-map {
@@ -116,10 +113,9 @@ body {
     flex-direction: column;
     justify-content: center;
     gap: 1.5rem;
-    height: 400px; /* Même hauteur que la carte */
+    height: 400px; /* Meme hauteur que la carte */
     box-sizing: border-box;
 }
-
 
 .info {
     font-size: 1.3rem;
@@ -129,7 +125,6 @@ body {
     font-size: 1.2rem;
     margin: 0.5rem 0;
 }
-
 
 /* Comments Section */
 .comments-section {
@@ -152,8 +147,30 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .location-section {
+        padding: 32px 16px;
+    }
+
     .location-content {
         flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .location-map-container,
+    .location-info {
+        width: 100%;
+        max-width: 320px;
+        min-width: 0;
+    }
+
+    .location-map {
+        height: 280px;
+    }
+
+    .location-info {
+        height: auto;
+        padding: 1rem;
     }
 
     .hero-section h1 {

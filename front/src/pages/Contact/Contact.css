@@ -1,4 +1,4 @@
-/* Empêche la barre de scroll horizontale */
+﻿/* Empêche la barre de scroll horizontale */
 body {
   overflow-x: hidden;
 }
@@ -34,7 +34,7 @@ body {
   flex-direction: column;
 }
 
-/* Éléments du formulaire */
+/* Elements du formulaire */
 .contact-form label {
   font-weight: 600;
   margin-bottom: 0.4rem;
@@ -94,7 +94,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 4rem 1rem;
-  min-height: calc(100vh - 120px); /* hauteur vue - header + footer estimés */
+  min-height: calc(100vh - 120px); /* hauteur vue - header + footer estimes */
   box-sizing: border-box;
   background-color: #f9f9f9;
 }

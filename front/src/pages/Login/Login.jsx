@@ -53,7 +53,7 @@ export default function Login() {
     } else {
       setEmailError("");
     }
-
+    
     // Vérification du format du mot de passe
     if (!validatePassword(password)) {
       setPasswordError(

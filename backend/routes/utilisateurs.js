@@ -6,6 +6,11 @@ import fetch from 'node-fetch';
 
 import { verifyToken, isAdmin, validate, AUTH_COOKIE_NAME } from '../middleware/verifyToken.js';
 import { sanitizeBody, sanitizeParams } from '../middleware/sanitize.js';
+import {
+  buildCsrfCookieOptions,
+  CSRF_COOKIE_NAME_CONST,
+  generateCsrfToken,
+} from '../middleware/csrf.js';
 
 import { loginValidator } from '../validators/auth.validators.js';
 import {
@@ -76,14 +81,20 @@ router.post(
         { expiresIn: '2h' }
       );
 
+      // CSRF token (double-submit cookie)
+      const csrfToken = generateCsrfToken();
+      const csrfCookieOptions = { ...buildCsrfCookieOptions(), maxAge: COOKIE_MAX_AGE };
+
       res.cookie(AUTH_COOKIE_NAME, token, {
         ...cookieBaseOptions,
         maxAge: COOKIE_MAX_AGE,
       });
+      res.cookie(CSRF_COOKIE_NAME_CONST, csrfToken, csrfCookieOptions);
 
       return res.json({
         message: 'Connexion réussie',
         user: formatUserResponse(utilisateur),
+        csrfToken,
       });
     } catch (err) {
       console.error(err);
@@ -95,6 +106,7 @@ router.post(
 /* -------- LOGOUT -------- */
 router.post('/logout', (_req, res) => {
   res.clearCookie(AUTH_COOKIE_NAME, cookieBaseOptions);
+  res.clearCookie(CSRF_COOKIE_NAME_CONST, buildCsrfCookieOptions());
   return res.json({ message: 'Déconnexion réussie' });
 });
 

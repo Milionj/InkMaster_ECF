@@ -8,6 +8,7 @@ import avisRouter from './routes/avis.route.js';
 import utilisateurRoutes from './routes/utilisateurs.js';
 import tatouageRoutes from './routes/tatouage.route.js';
 import serviceRoutes from './routes/service.route.js';
+import { csrfProtection } from './middleware/csrf.js';
 
 dotenv.config();
 
@@ -44,6 +45,9 @@ app.use(cookieParser());
 
 // Pour lire le JSON
 app.use(express.json());
+
+// CSRF (double-submit cookie)
+app.use(csrfProtection);
 
 // csp 
 app.use((req, res, next) => {

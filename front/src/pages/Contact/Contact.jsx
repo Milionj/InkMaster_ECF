@@ -15,11 +15,13 @@ const Contact = () => {
   const [message, setMessage] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [erreur, setErreur] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErreur("");
     setConfirmation("");
 
@@ -44,6 +46,8 @@ const Contact = () => {
       return setErreur(`Le message doit contenir entre ${MIN_MESSAGE} et ${MAX_MESSAGE} caracteres.`);
     }
 
+    setIsSubmitting(true);
+
     try {
       await addDoc(collection(db, "contact"), {
         nom: nomTrim,
@@ -61,6 +65,8 @@ const Contact = () => {
     } catch (error) {
       console.error(error);
       setErreur("Erreur d'envoi. Reessayez.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -102,7 +108,9 @@ const Contact = () => {
           required
         />
 
-        <button type="submit">Envoyer</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Envoi..." : "Envoyer"}
+        </button>
       </form>
 
       {confirmation && <p className="confirmation">{confirmation}</p>}

@@ -18,6 +18,7 @@ export default function Login() {
   const [erreur, setErreur] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Ref pour pouvoir reset le reCAPTCHA après soumission
   const recaptchaRef = useRef(null);
@@ -39,6 +40,7 @@ export default function Login() {
   // Fonction déclenchée lors de la soumission du formulaire
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     // Si le reCAPTCHA n’a pas été validé, on empêche l’envoi
     if (!captchaToken) {
@@ -66,6 +68,8 @@ export default function Login() {
 
     // Affiche le token reCAPTCHA dans la console pour le debug
     console.log("Token captcha envoyé au backend :", captchaToken);
+
+    setIsSubmitting(true);
 
     try {
       // Envoie des données de connexion + token captcha au backend
@@ -104,6 +108,8 @@ export default function Login() {
       } else {
         setErreur("Email ou mot de passe incorrect.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
 
     // On reset le reCAPTCHA pour permettre une nouvelle tentative
@@ -148,7 +154,9 @@ export default function Login() {
           ref={recaptchaRef}
         />
 
-        <button type="submit">Connexion</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Connexion..." : "Connexion"}
+        </button>
 
         {/* Affichage d’un message d’erreur global si besoin */}
         {erreur && <p className="error-msg">{erreur}</p>}

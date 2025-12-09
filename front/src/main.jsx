@@ -6,8 +6,10 @@ import App from './App.jsx';
 
 import { UserProvider } from './Context/UserContext.jsx';
 import { CookieConsentProvider } from './Context/CookieConsentContext.jsx';
+import { attachCsrfHeader } from './api/csrf.js';
 
 axios.defaults.withCredentials = true;
+axios.interceptors.request.use(attachCsrfHeader);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -11,6 +11,9 @@ export default function Dashboard() {
   const [newUser, setNewUser] = useState({ nom: '', prenom: '', email: '', password: '', role: 'artiste' });
   const [newTattoo, setNewTattoo] = useState({ titre: '', description: '', image: '', id_utilisateur: '' });
   const [newService, setNewService] = useState({ nom: '', description: '' });
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [isCreatingTattoo, setIsCreatingTattoo] = useState(false);
+  const [isCreatingService, setIsCreatingService] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -33,9 +36,19 @@ export default function Dashboard() {
 
   // CRUD UTILISATEURS
   const creerUser = async () => {
-    await axios.post('http://localhost:5000/api/utilisateurs', newUser, { withCredentials: true });
-    setNewUser({ nom: '', prenom: '', email: '', password: '', role: 'artiste' });
-    fetchData();
+    if (isCreatingUser) return;
+    setErreur('');
+    setIsCreatingUser(true);
+    try {
+      await axios.post('http://localhost:5000/api/utilisateurs', newUser, { withCredentials: true });
+      setNewUser({ nom: '', prenom: '', email: '', password: '', role: 'artiste' });
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      setErreur("Erreur lors de la creation utilisateur.");
+    } finally {
+      setIsCreatingUser(false);
+    }
   };
 
   const modifierUser = async (id, champ, valeur) => {
@@ -55,9 +68,19 @@ export default function Dashboard() {
 
   // CRUD TATOUAGES
   const creerTattoo = async () => {
-    await axios.post('http://localhost:5000/api/tatouages', newTattoo, { withCredentials: true });
-    setNewTattoo({ titre: '', description: '', image: '', id_utilisateur: '' });
-    fetchData();
+    if (isCreatingTattoo) return;
+    setErreur('');
+    setIsCreatingTattoo(true);
+    try {
+      await axios.post('http://localhost:5000/api/tatouages', newTattoo, { withCredentials: true });
+      setNewTattoo({ titre: '', description: '', image: '', id_utilisateur: '' });
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      setErreur("Erreur lors de la creation du tatouage.");
+    } finally {
+      setIsCreatingTattoo(false);
+    }
   };
 
   const modifierTattoo = async (id, champ, valeur) => {
@@ -77,9 +100,19 @@ export default function Dashboard() {
 
   // CRUD SERVICES
   const creerService = async () => {
-    await axios.post('http://localhost:5000/api/services', newService, { withCredentials: true });
-    setNewService({ nom: '', description: '' });
-    fetchData();
+    if (isCreatingService) return;
+    setErreur('');
+    setIsCreatingService(true);
+    try {
+      await axios.post('http://localhost:5000/api/services', newService, { withCredentials: true });
+      setNewService({ nom: '', description: '' });
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      setErreur("Erreur lors de la creation du service.");
+    } finally {
+      setIsCreatingService(false);
+    }
   };
 
   const modifierService = async (id, champ, valeur) => {
@@ -115,7 +148,9 @@ export default function Dashboard() {
             <option value="artiste">Artiste</option>
             <option value="admin">Admin</option>
           </select>
-          <button type="submit">Créer</button>
+          <button type="submit" disabled={isCreatingUser}>
+            {isCreatingUser ? "Creation..." : "Creer"}
+          </button>
         </form>
 
         <table>
@@ -147,7 +182,9 @@ export default function Dashboard() {
           <input placeholder="Description" value={newTattoo.description} onChange={(e) => setNewTattoo({ ...newTattoo, description: e.target.value })} />
           <input placeholder="Image URL" value={newTattoo.image} onChange={(e) => setNewTattoo({ ...newTattoo, image: e.target.value })} />
           <input placeholder="ID Artiste" value={newTattoo.id_utilisateur} onChange={(e) => setNewTattoo({ ...newTattoo, id_utilisateur: e.target.value })} />
-          <button type="submit">Créer</button>
+          <button type="submit" disabled={isCreatingTattoo}>
+            {isCreatingTattoo ? "Creation..." : "Creer"}
+          </button>
         </form>
 
         <table>
@@ -177,7 +214,9 @@ export default function Dashboard() {
         <form onSubmit={(e) => { e.preventDefault(); creerService(); }}>
           <input placeholder="Nom" value={newService.nom} onChange={(e) => setNewService({ ...newService, nom: e.target.value })} />
           <input placeholder="Description" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} />
-          <button type="submit">Créer</button>
+          <button type="submit" disabled={isCreatingService}>
+            {isCreatingService ? "Creation..." : "Creer"}
+          </button>
         </form>
 
         <table>

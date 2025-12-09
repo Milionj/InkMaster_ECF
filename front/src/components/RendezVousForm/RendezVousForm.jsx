@@ -21,6 +21,7 @@ export default function RendezVousForm() {
 
   const [confirmation, setConfirmation] = useState("");
   const [erreur, setErreur] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const validatePhone = (phone) => phone.trim() === "" || /^(\+33|0)[1-9](\d{2}){4}$/.test(phone.trim());
@@ -31,6 +32,7 @@ export default function RendezVousForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErreur("");
     setConfirmation("");
 
@@ -59,6 +61,8 @@ export default function RendezVousForm() {
       return setErreur(`Le message doit contenir entre ${MIN_MESSAGE} et ${MAX_MESSAGE} caractères.`);
     }
 
+    setIsSubmitting(true);
+
     try {
       await addDoc(collection(db, "rendez_vous"), {
         nom: nomTrim,
@@ -82,6 +86,8 @@ export default function RendezVousForm() {
     } catch (err) {
       console.error(err);
       setErreur("Une erreur est survenue.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -124,7 +130,9 @@ export default function RendezVousForm() {
         onChange={handleChange}
       />
 
-      <button type="submit">Envoyer</button>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Envoi..." : "Envoyer"}
+      </button>
 
       {confirmation && <p className="success">{confirmation}</p>}
       {erreur && <p className="error">{erreur}</p>}

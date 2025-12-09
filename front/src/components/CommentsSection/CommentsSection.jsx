@@ -21,6 +21,7 @@ const CommentsSection = () => {
   const [confirmation, setConfirmation] = useState('');
   const [comments, setComments] = useState([]);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Ecouter en temps reel les commentaires depuis Firestore
   useEffect(() => {
@@ -46,6 +47,7 @@ const CommentsSection = () => {
   // Soumettre un nouvel avis
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError('');
     setConfirmation('');
 
@@ -59,6 +61,8 @@ const CommentsSection = () => {
     if (messageTrim.length < MIN_MESSAGE || messageTrim.length > MAX_MESSAGE) {
       return setError(`Le message doit contenir entre ${MIN_MESSAGE} et ${MAX_MESSAGE} caracteres.`);
     }
+
+    setIsSubmitting(true);
 
     try {
       await addDoc(collection(db, 'avis'), {
@@ -77,6 +81,8 @@ const CommentsSection = () => {
     } catch (error) {
       console.error("Erreur lors de l'envoi du commentaire :", error);
       setError("Impossible d'envoyer le commentaire. Reessayez.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -134,7 +140,9 @@ const CommentsSection = () => {
             ))}
           </div>
 
-          <button type="submit">Envoyer</button>
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Envoi..." : "Envoyer"}
+          </button>
         </form>
       </div>
     </section>

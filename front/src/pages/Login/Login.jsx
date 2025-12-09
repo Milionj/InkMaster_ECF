@@ -1,4 +1,3 @@
-// front/src/pages/Login/Login.jsx
 import { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -59,14 +58,14 @@ export default function Login() {
     // Vérification du format du mot de passe
     if (!validatePassword(password)) {
       setPasswordError(
-        "Mot de passe invalide : minimum 12 caractères avec majuscule, minuscule, chiffre et caractère spécial."
+        "Mot de passe invalide !"
       );
       return;
     } else {
       setPasswordError("");
     }
 
-    // Affiche le token reCAPTCHA dans la console pour le debug
+    // Affiche le token reCAPTCHA dans la console  (debug)
     console.log("Token captcha envoyé au backend :", captchaToken);
 
     setIsSubmitting(true);

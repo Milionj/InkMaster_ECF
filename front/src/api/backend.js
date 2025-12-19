@@ -1,9 +1,9 @@
 ﻿import axios from 'axios';
 import { attachCsrfHeader } from './csrf.js';
 
-// En dev on force le mock par défaut pour éviter les requêtes réseau involontaires.
-const useMock = (import.meta.env.VITE_USE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
-const apiBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+// Par défaut on force le mock pour éviter tout appel localhost ou CORS
+const useMock = (import.meta.env.VITE_USE_MOCK ?? 'true') === 'true';
+const apiBaseURL = import.meta.env.VITE_API_BASE_URL || '/.netlify/functions';
 
 const api = axios.create({ baseURL: apiBaseURL, withCredentials: true });
 api.interceptors.request.use(attachCsrfHeader);
@@ -17,10 +17,10 @@ const defaultState = {
   version: MOCK_VERSION,
   sessionUserId: null,
   users: [
-    { id: 15, nom: 'Admin', prenom: 'Principal', email: 'admin@inkmaster.com', password: 'Password123!', role: 'admin' },
-    { id: 16, nom: 'Webs', prenom: 'Tatoueur', email: 'webs@inkmaster.com', password: 'Password123!', role: 'artiste' },
-    { id: 17, nom: 'Jade', prenom: 'Tatoueuse', email: 'jade@inkmaster.com', password: 'Password123!', role: 'artiste' },
-    { id: 18, nom: 'Crusher', prenom: 'Tatoueur/Perceur', email: 'crusher@inkmaster.com', password: 'Password123!', role: 'artiste' }
+    { id: 15, role: 'admin', email: 'admin@inkmaster.com', nom: 'Admin', prenom: 'Principal' },
+    { id: 16, role: 'artiste', email: 'webs@inkmaster.com', nom: 'Webs', prenom: 'Tatoueur' },
+    { id: 17, role: 'artiste', email: 'jade@inkmaster.com', nom: 'Jade', prenom: 'Tatoueuse' },
+    { id: 18, role: 'artiste', email: 'crusher@inkmaster.com', nom: 'Crusher', prenom: 'Tatoueur/Perceur' }
   ],
   tattoos: [
     { id: 1, id_tatouage: 1, id_utilisateur: 16, titre: 'Ghost Never Die', image: 'ghostneverdie.JPG', description: 'Ombres et revenants' },
@@ -359,7 +359,6 @@ export async function deleteService(id) {
 
 export async function fetchAvis() {
   if (useMock) return mockApi.listAvis();
-  // Pas d'API REST pour avis (Firestore côté client). On retourne vide pour éviter une erreur réseau.
   return [];
 }
 

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUser } from "../../Context/UserContext";
@@ -13,6 +13,7 @@ export default function Login() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDialog, setShowDialog] = useState(true);
 
   const navigate = useNavigate();
 
@@ -22,8 +23,6 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-
-    alert("Si vous voulez vous connecter à ce site veuillez me contacter via : www.linkedin.com/in/serge-weber-b414b3232 , mes infos sur : https://sergeweberportfolio.netlify.app/ .");
 
     if (!validateEmail(email)) {
       setEmailError("Format d'email invalide.");
@@ -56,9 +55,31 @@ export default function Login() {
     }
   };
 
+  useEffect(() => {
+    setShowDialog(true);
+  }, []);
+
   return (
     <div className="login-page">
       <h1>Connexion</h1>
+
+      {showDialog && (
+        <div className="login-dialog">
+          <p>Si vous voulez vous connecter à ce site veuillez me contacter via :</p>
+          <p>
+            <a href="https://www.linkedin.com/in/serge-weber-b414b3232" target="_blank" rel="noreferrer">
+              www.linkedin.com/in/serge-weber-b414b3232
+            </a>
+          </p>
+          <p>
+            Mes infos sur :
+            <a href="https://sergeweberportfolio.netlify.app/" target="_blank" rel="noreferrer">
+              https://sergeweberportfolio.netlify.app/
+            </a>
+          </p>
+          <button type="button" onClick={() => setShowDialog(false)}>Fermer</button>
+        </div>
+      )}
 
       <form onSubmit={handleLogin} className="login-box">
         <label>Email</label>

@@ -9,8 +9,7 @@ const api = axios.create({ baseURL: apiBaseURL, withCredentials: true });
 api.interceptors.request.use(attachCsrfHeader);
 
 const STORAGE_KEY = 'inkmaster-mock-db';
-const MOCK_VERSION = 5;
-const isNetlifyHost = typeof window !== 'undefined' && window.location.hostname.includes('netlify.app');
+const MOCK_VERSION = 4;
 
 const now = () => new Date().toISOString();
 
@@ -55,16 +54,6 @@ const clone = (data) => JSON.parse(JSON.stringify(data));
 function loadMockState() {
   const base = clone(defaultState);
   if (typeof localStorage === 'undefined') return base;
-
-  if (isNetlifyHost) {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (err) {
-      console.warn('Impossible de purger le mock', err);
-    }
-    return base;
-  }
-
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {

@@ -1,20 +1,20 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUser } from "../../Context/UserContext";
-import { isMock } from "../../api/backend";
 import "./Login.css";
 
 export default function Login() {
   const { login } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
   const [erreur, setErreur] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDialog, setShowDialog] = useState(true);
 
+  const recaptchaRef = useRef(null);
   const navigate = useNavigate();
 
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -23,6 +23,13 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
+
+    alert("Si vous voulez vous connecter à ce site veuillez me contacter via : www.linkedin.com/in/serge-weber-b414b3232 , mes infos sur : https://sergeweberportfolio.netlify.app/ .");
+
+    if (!captchaToken) {
+      setErreur("Veuillez valider le reCAPTCHA.");
+      return;
+    }
 
     if (!validateEmail(email)) {
       setEmailError("Format d'email invalide.");
@@ -39,7 +46,7 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
-      const user = await login(email, password, "");
+      const user = await login(email, password, captchaToken);
       if (user.role === "admin") {
         navigate("/dashboard");
       } else if (user.role === "artiste") {
@@ -49,37 +56,24 @@ export default function Login() {
       }
     } catch (err) {
       console.error(err);
-      setErreur("Email ou mot de passe incorrect.");
+      if (err.response?.data?.message === "Captcha invalide") {
+        setErreur("Captcha invalide. Merci de cocher à nouveau.");
+      } else {
+        setErreur("Email ou mot de passe incorrect.");
+      }
     } finally {
       setIsSubmitting(false);
     }
-  };
 
-  useEffect(() => {
-    setShowDialog(true);
-  }, []);
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+      setCaptchaToken("");
+    }
+  };
 
   return (
     <div className="login-page">
       <h1>Connexion</h1>
-
-      {showDialog && (
-        <div className="login-dialog">
-          <p>Si vous voulez vous connecter à ce site veuillez me contacter via :</p>
-          <p>
-            <a href="https://www.linkedin.com/in/serge-weber-b414b3232" target="_blank" rel="noreferrer">
-              www.linkedin.com/in/serge-weber-b414b3232
-            </a>
-          </p>
-          <p>
-            Mes infos sur :
-            <a href="https://sergeweberportfolio.netlify.app/" target="_blank" rel="noreferrer">
-              https://sergeweberportfolio.netlify.app/
-            </a>
-          </p>
-          <button type="button" onClick={() => setShowDialog(false)}>Fermer</button>
-        </div>
-      )}
 
       <form onSubmit={handleLogin} className="login-box">
         <label>Email</label>
@@ -102,12 +96,11 @@ export default function Login() {
         />
         {passwordError && <p className="error-msg">{passwordError}</p>}
 
-        {!isMock && (
-          <ReCAPTCHA
-            sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
-            onChange={() => {}}
-          />
-        )}
+        <ReCAPTCHA
+          sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
+          onChange={(token) => setCaptchaToken(token || "")}
+          ref={recaptchaRef}
+        />
 
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Connexion..." : "Connexion"}

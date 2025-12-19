@@ -11,9 +11,10 @@ const GalleryCarousel = () => {
     const fetchTatouages = async () => {
       try {
         const res = await fetchTatouagesPublic();
-        setArtworks(res);
+        setArtworks(Array.isArray(res) ? res : []);
       } catch (err) {
         console.error('Erreur lors du chargement des tatouages', err);
+        setArtworks([]);
       }
     };
 

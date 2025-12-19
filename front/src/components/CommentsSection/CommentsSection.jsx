@@ -27,7 +27,12 @@ const CommentsSection = () => {
   // Charger les avis (mock ou Firestore temps réel)
   useEffect(() => {
     if (isMock) {
-      fetchAvis().then(setComments).catch((err) => console.error(err));
+      fetchAvis()
+        .then((data) => setComments(Array.isArray(data) ? data : []))
+        .catch((err) => {
+          console.error(err);
+          setComments([]);
+        });
       return undefined;
     }
 
@@ -41,7 +46,7 @@ const CommentsSection = () => {
           createdAt: data.createdAt?.toDate() ?? null,
         };
       });
-      setComments(loadedComments);
+      setComments(Array.isArray(loadedComments) ? loadedComments : []);
     });
     return () => unsubscribe();
   }, []);

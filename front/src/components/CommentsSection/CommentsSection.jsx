@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
-import './CommentsSection.css'
+import './CommentsSection.css';
+import { isMock, fetchAvis, createAvis } from '../../api/backend.js';
 import {
   collection,
   addDoc,
@@ -23,10 +24,14 @@ const CommentsSection = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Ecouter en temps reel les commentaires depuis Firestore
+  // Charger les avis (mock ou Firestore temps réel)
   useEffect(() => {
-    const q = query(collection(db, 'avis'), orderBy('createdAt', 'desc'));
+    if (isMock) {
+      fetchAvis().then(setComments).catch((err) => console.error(err));
+      return undefined;
+    }
 
+    const q = query(collection(db, 'avis'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const loadedComments = snapshot.docs.map((doc) => {
         const data = doc.data();
@@ -38,13 +43,11 @@ const CommentsSection = () => {
       });
       setComments(loadedComments);
     });
-
     return () => unsubscribe();
   }, []);
 
   const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
-  // Soumettre un nouvel avis
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -55,7 +58,7 @@ const CommentsSection = () => {
     const messageTrim = message.trim();
 
     if (!isValidEmail(emailTrim) || emailTrim.length > MAX_EMAIL) {
-      return setError("Email invalide ou trop long.");
+      return setError('Email invalide ou trop long.');
     }
 
     if (messageTrim.length < MIN_MESSAGE || messageTrim.length > MAX_MESSAGE) {
@@ -65,12 +68,17 @@ const CommentsSection = () => {
     setIsSubmitting(true);
 
     try {
-      await addDoc(collection(db, 'avis'), {
-        email: emailTrim,
-        message: messageTrim,
-        rating,
-        createdAt: serverTimestamp(),
-      });
+      if (isMock) {
+        const newAvis = await createAvis({ email: emailTrim, message: messageTrim, rating: rating || 0 });
+        setComments((prev) => [newAvis, ...prev]);
+      } else {
+        await addDoc(collection(db, 'avis'), {
+          email: emailTrim,
+          message: messageTrim,
+          rating,
+          createdAt: serverTimestamp(),
+        });
+      }
 
       setConfirmation('Merci pour votre commentaire !');
       setEmail('');
@@ -78,8 +86,8 @@ const CommentsSection = () => {
       setRating(0);
 
       setTimeout(() => setConfirmation(''), 4000);
-    } catch (error) {
-      console.error("Erreur lors de l'envoi du commentaire :", error);
+    } catch (err) {
+      console.error("Erreur lors de l'envoi du commentaire :", err);
       setError("Impossible d'envoyer le commentaire. Reessayez.");
     } finally {
       setIsSubmitting(false);
@@ -93,12 +101,12 @@ const CommentsSection = () => {
       <div className="comments-container">
         <div className="comments-list">
           {comments.map((comment) => (
-            <div key={comment.id} className="comment">
+            <div key={comment.id || `${comment.email}-${comment.message}` } className="comment">
               <strong>{comment.email}</strong>
               <p>{comment.message}</p>
               {comment.rating > 0 && (
                 <div className="comment-rating">
-                  {"★".repeat(comment.rating)}{"☆".repeat(5 - comment.rating)}
+                  {'★'.repeat(comment.rating)}{'☆'.repeat(5 - comment.rating)}
                 </div>
               )}
             </div>
@@ -132,7 +140,7 @@ const CommentsSection = () => {
             {[1, 2, 3, 4, 5].map((star) => (
               <span
                 key={star}
-                className={star <= rating ? "star filled" : "star"}
+                className={star <= rating ? 'star filled' : 'star'}
                 onClick={() => setRating(star)}
               >
                 ★
@@ -141,7 +149,7 @@ const CommentsSection = () => {
           </div>
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Envoi..." : "Envoyer"}
+            {isSubmitting ? 'Envoi...' : 'Envoyer'}
           </button>
         </form>
       </div>

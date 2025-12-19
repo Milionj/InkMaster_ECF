@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db } from "../../firebase"; // même chemin que dans RendezVousForm
+import { db } from "../../firebase";
 import { useUser } from "../../Context/UserContext";
+import { isMock, fetchRendezVous, updateRendezVous, deleteRendezVous } from "../../api/backend.js";
 import "./RendezVousGestion.css";
 
 export default function RendezVousGestion() {
@@ -14,7 +15,6 @@ export default function RendezVousGestion() {
   const [loading, setLoading] = useState(true);
   const [erreur, setErreur] = useState("");
 
-  // Protection : seulement artiste + admin
   useEffect(() => {
     if (userLoading) return;
     if (role !== "artiste" && role !== "admin") {
@@ -22,16 +22,22 @@ export default function RendezVousGestion() {
     }
   }, [role, userLoading, navigate]);
 
-  // Récupération des rendez-vous depuis Firestore
   useEffect(() => {
     setLoading(true);
     setErreur("");
 
-    const q = query(
-      collection(db, "rendez_vous"),
-      orderBy("timestamp", "desc")
-    );
+    if (isMock) {
+      fetchRendezVous()
+        .then((data) => setRdvList(data))
+        .catch((err) => {
+          console.error(err);
+          setErreur("Impossible de récupérer les rendez-vous.");
+        })
+        .finally(() => setLoading(false));
+      return undefined;
+    }
 
+    const q = query(collection(db, "rendez_vous"), orderBy("timestamp", "desc"));
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -48,15 +54,19 @@ export default function RendezVousGestion() {
         setLoading(false);
       }
     );
-
     return () => unsubscribe();
   }, []);
 
   const handleChangeStatut = async (id, newStatut) => {
     try {
-      await updateDoc(doc(db, "rendez_vous", id), {
-        statut: newStatut,
-      });
+      if (isMock) {
+        const updated = await updateRendezVous(id, { statut: newStatut });
+        setRdvList((prev) => prev.map((r) => (r.id === id ? updated : r)));
+      } else {
+        await updateDoc(doc(db, "rendez_vous", id), {
+          statut: newStatut,
+        });
+      }
     } catch (error) {
       console.error("Erreur update statut:", error);
       setErreur("Impossible de mettre à jour le statut.");
@@ -65,9 +75,13 @@ export default function RendezVousGestion() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Supprimer ce rendez-vous ?")) return;
-
     try {
-      await deleteDoc(doc(db, "rendez_vous", id));
+      if (isMock) {
+        await deleteRendezVous(id);
+        setRdvList((prev) => prev.filter((r) => r.id !== id));
+      } else {
+        await deleteDoc(doc(db, "rendez_vous", id));
+      }
     } catch (error) {
       console.error("Erreur suppression:", error);
       setErreur("Impossible de supprimer ce rendez-vous.");
@@ -172,4 +186,3 @@ export default function RendezVousGestion() {
     </section>
   );
 }
-

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   collection,
   deleteDoc,
@@ -8,54 +8,54 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { isMock, fetchAvis, deleteAvis } from '../../api/backend.js';
 import './ModerationAvis.css';
 
 export default function ModerationAvis() {
   const [avis, setAvis] = useState([]);
   const [message, setMessage] = useState('');
 
-  // Vérifier si l'utilisateur Firebase est connecté (facultatif, pour debug)
-    useEffect(() => {
+  useEffect(() => {
     const auth = getAuth();
     console.log('Utilisateur Firebase connecté :', auth.currentUser?.email);
   }, []);
 
-  // Fonction utilitaire : vérifier si l’avis est récent (moins de 24h)
   const isNew = (createdAt) => {
-    if (!createdAt?.toDate) return false;
-    const now = new Date();
-    const diff = now - createdAt.toDate();
-    return diff < 1000 * 60 * 60 * 24; // moins de 24 heures
+    const date = createdAt?.toDate ? createdAt.toDate() : new Date(createdAt);
+    if (!date) return false;
+    const diff = Date.now() - date;
+    return diff < 1000 * 60 * 60 * 24;
   };
 
-  // Écouter en temps réel tous les avis
   useEffect(() => {
+    if (isMock) {
+      fetchAvis().then(setAvis).catch((err) => console.error(err));
+      return undefined;
+    }
+
     const q = query(collection(db, 'avis'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
       setAvis(data);
     });
-
-    return () => unsubscribe(); // Nettoyage du listener
+    return () => unsubscribe();
   }, []);
 
-  // Supprimer un avis (désapprobation)
-const handleDelete = async (id) => {
-  try {
-    await deleteDoc(doc(db, 'avis', id));
-    setMessage('❌ Avis désapprouvé et supprimé.');
-
-    // Optionnel si on veut que le message disparaisse
-    setTimeout(() => setMessage(''), 4000);
-  } catch (err) {
-    console.error('Erreur suppression avis :', err);
-    alert("Erreur Firebase : " + err.message);
-  }
-};
-
+  const handleDelete = async (id) => {
+    try {
+      if (isMock) {
+        await deleteAvis(id);
+        setAvis((prev) => prev.filter((a) => a.id !== id));
+      } else {
+        await deleteDoc(doc(db, 'avis', id));
+      }
+      setMessage('Avis désapprouvé et supprimé.');
+      setTimeout(() => setMessage(''), 4000);
+    } catch (err) {
+      console.error('Erreur suppression avis :', err);
+      alert('Erreur : ' + err.message);
+    }
+  };
 
   return (
     <div className="moderation-container">
@@ -79,13 +79,12 @@ const handleDelete = async (id) => {
               </div>
             )}
 
-            {/* Badge pour les nouveaux avis */}
             {isNew(a.createdAt) && (
-              <div className="badge">🆕 Nouveau</div>
+              <div className="badge">Nouveau</div>
             )}
 
             <div className="actions">
-              <button onClick={() => handleDelete(a.id)}>❌ Désapprouver</button>
+              <button onClick={() => handleDelete(a.id)}>Désapprouver</button>
             </div>
           </div>
         ))

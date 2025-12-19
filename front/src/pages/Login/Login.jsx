@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUser } from "../../Context/UserContext";
@@ -14,7 +14,6 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const recaptchaRef = useRef(null);
   const navigate = useNavigate();
 
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -23,12 +22,8 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    setErreur("");
 
-    if (!captchaToken) {
-      setErreur("Veuillez valider le reCAPTCHA.");
-      return;
-    }
+    alert("Si vous voulez vous connecter à ce site veuillez me contacter via : www.linkedin.com/in/serge-weber-b414b3232 , mes infos sur : https://sergeweberportfolio.netlify.app/ .");
 
     if (!validateEmail(email)) {
       setEmailError("Format d'email invalide.");
@@ -55,14 +50,9 @@ export default function Login() {
       }
     } catch (err) {
       console.error(err);
-      setErreur("Email, mot de passe ou captcha incorrect.");
+      setErreur("Email ou mot de passe incorrect.");
     } finally {
       setIsSubmitting(false);
-    }
-
-    if (recaptchaRef.current) {
-      recaptchaRef.current.reset();
-      setCaptchaToken("");
     }
   };
 
@@ -94,7 +84,6 @@ export default function Login() {
         <ReCAPTCHA
           sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
           onChange={(token) => setCaptchaToken(token || "")}
-          ref={recaptchaRef}
         />
 
         <button type="submit" disabled={isSubmitting}>

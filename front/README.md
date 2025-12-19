@@ -19,7 +19,7 @@
 ## Variables (.env / Netlify env)
 ```
 VITE_USE_MOCK=true
-VITE_API_BASE_URL=http://localhost:5000
+VITE_API_BASE_URL=/.netlify/functions
 VITE_FIREBASE_API_KEY=demo
 VITE_FIREBASE_AUTH_DOMAIN=demo.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=demo
@@ -27,7 +27,7 @@ VITE_FIREBASE_STORAGE_BUCKET=demo
 VITE_FIREBASE_MESSAGING_SENDER_ID=demo
 VITE_FIREBASE_APP_ID=demo
 ```
-- Pour utiliser les fonctions Netlify, mettez `VITE_API_BASE_URL=/.netlify/functions` et (optionnel) `VITE_USE_MOCK=false`.
+- Pour utiliser les fonctions Netlify, gardez `VITE_API_BASE_URL=/.netlify/functions` et (optionnel) `VITE_USE_MOCK=false` si vous voulez consommer les handlers serverless plutôt que le mock front.
 
 ## Fonctions Netlify fournies (mock)
 - `netlify/functions/tatouages.js` : GET tatouages mock (public)

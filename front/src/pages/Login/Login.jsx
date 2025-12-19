@@ -2,13 +2,13 @@
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUser } from "../../Context/UserContext";
+import { isMock } from "../../api/backend";
 import "./Login.css";
 
 export default function Login() {
   const { login } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captchaToken, setCaptchaToken] = useState("");
   const [erreur, setErreur] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -39,7 +39,7 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
-      const user = await login(email, password, captchaToken);
+      const user = await login(email, password, "");
       if (user.role === "admin") {
         navigate("/dashboard");
       } else if (user.role === "artiste") {
@@ -102,10 +102,12 @@ export default function Login() {
         />
         {passwordError && <p className="error-msg">{passwordError}</p>}
 
-        <ReCAPTCHA
-          sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
-          onChange={(token) => setCaptchaToken(token || "")}
-        />
+        {!isMock && (
+          <ReCAPTCHA
+            sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
+            onChange={() => {}}
+          />
+        )}
 
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Connexion..." : "Connexion"}

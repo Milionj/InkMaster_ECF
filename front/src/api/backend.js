@@ -9,7 +9,8 @@ const api = axios.create({ baseURL: apiBaseURL, withCredentials: true });
 api.interceptors.request.use(attachCsrfHeader);
 
 const STORAGE_KEY = 'inkmaster-mock-db';
-const MOCK_VERSION = 3;
+const MOCK_VERSION = 5;
+const isNetlifyHost = typeof window !== 'undefined' && window.location.hostname.includes('netlify.app');
 
 const now = () => new Date().toISOString();
 
@@ -17,10 +18,10 @@ const defaultState = {
   version: MOCK_VERSION,
   sessionUserId: null,
   users: [
-    { id: 15, role: 'admin', email: 'admin@inkmaster.com', nom: 'Admin', prenom: 'Principal' },
-    { id: 16, role: 'artiste', email: 'webs@inkmaster.com', nom: 'Webs', prenom: 'Tatoueur' },
-    { id: 17, role: 'artiste', email: 'jade@inkmaster.com', nom: 'Jade', prenom: 'Tatoueuse' },
-    { id: 18, role: 'artiste', email: 'crusher@inkmaster.com', nom: 'Crusher', prenom: 'Tatoueur/Perceur' }
+    { id: 15, role: 'admin', email: 'admin@inkmaster.com', nom: 'Admin', prenom: 'Principal', password: 'Password123!' },
+    { id: 16, role: 'artiste', email: 'webs@inkmaster.com', nom: 'Webs', prenom: 'Tatoueur', password: 'Password123!' },
+    { id: 17, role: 'artiste', email: 'jade@inkmaster.com', nom: 'Jade', prenom: 'Tatoueuse', password: 'Password123!' },
+    { id: 18, role: 'artiste', email: 'crusher@inkmaster.com', nom: 'Crusher', prenom: 'Tatoueur/Perceur', password: 'Password123!' }
   ],
   tattoos: [
     { id: 1, id_tatouage: 1, id_utilisateur: 16, titre: 'Ghost Never Die', image: 'ghostneverdie.JPG', description: 'Ombres et revenants' },
@@ -54,6 +55,16 @@ const clone = (data) => JSON.parse(JSON.stringify(data));
 function loadMockState() {
   const base = clone(defaultState);
   if (typeof localStorage === 'undefined') return base;
+
+  if (isNetlifyHost) {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      console.warn('Impossible de purger le mock', err);
+    }
+    return base;
+  }
+
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {

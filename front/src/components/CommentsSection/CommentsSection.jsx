@@ -9,6 +9,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { isMock, fetchAvis } from '../../api/backend';
 
 const MAX_EMAIL = 120;
 const MAX_MESSAGE = 1000;
@@ -25,6 +26,17 @@ const CommentsSection = () => {
 
   // Ecouter en temps reel les commentaires depuis Firestore
   useEffect(() => {
+    if (isMock || !db) {
+      // En mock : données locales uniquement
+      fetchAvis()
+        .then((data) => setComments(Array.isArray(data) ? data : []))
+        .catch((err) => {
+          console.error(err);
+          setComments([]);
+        });
+      return undefined;
+    }
+
     const q = query(collection(db, 'avis'), orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -65,12 +77,17 @@ const CommentsSection = () => {
     setIsSubmitting(true);
 
     try {
-      await addDoc(collection(db, 'avis'), {
-        email: emailTrim,
-        message: messageTrim,
-        rating,
-        createdAt: serverTimestamp(),
-      });
+      if (isMock || !db) {
+        const newAvis = { id: Date.now(), email: emailTrim, message: messageTrim, rating, createdAt: new Date() };
+        setComments((prev) => [newAvis, ...prev]);
+      } else {
+        await addDoc(collection(db, 'avis'), {
+          email: emailTrim,
+          message: messageTrim,
+          rating,
+          createdAt: serverTimestamp(),
+        });
+      }
 
       setConfirmation('Merci pour votre commentaire !');
       setEmail('');

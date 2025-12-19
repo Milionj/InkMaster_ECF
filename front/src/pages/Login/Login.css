@@ -45,7 +45,7 @@
 
 .login-box button {
   width: 100%;
-  background-color: #35598f;
+  background-color: #000000;
   color: white;
   padding: 15px;
   font-size: 1.2rem;
@@ -57,7 +57,7 @@
 }
 
 .login-box button:hover {
-  background-color: #2a4470;
+  background-color: #000000;
 }
 
 .error-msg {

@@ -1,69 +1,25 @@
-# React + TypeScript + Vite
+﻿# InkMaster Front
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Modes backend
+- **Backend réel** : configurez `VITE_API_BASE_URL` (par défaut `http://localhost:5000`) et laissez `VITE_USE_MOCK=false`.
+- **Mode mock (Netlify)** : mettez `VITE_USE_MOCK=true` pour utiliser des données locales en mémoire (persistées dans `localStorage`). Un admin de démo est disponible : `admin@inkmaster.com` / `Password123!` (artistes : `webs|jade|crusher@inkmaster.com`).
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Variables (.env / Netlify env)
+```
+VITE_USE_MOCK=true
+VITE_API_BASE_URL=http://localhost:5000
+VITE_FIREBASE_API_KEY=demo
+VITE_FIREBASE_AUTH_DOMAIN=demo.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=demo
+VITE_FIREBASE_STORAGE_BUCKET=demo
+VITE_FIREBASE_MESSAGING_SENDER_ID=demo
+VITE_FIREBASE_APP_ID=demo
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Sur Netlify, définissez ces variables dans Site settings > Environment variables pour voir les données mock dès le premier chargement.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Scripts
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`

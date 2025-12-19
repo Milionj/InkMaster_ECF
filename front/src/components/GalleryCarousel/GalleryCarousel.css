@@ -141,7 +141,7 @@ body {
 .pagination_button {
   padding: 0.5rem 1rem;
   border: none;
-  background-color: #35598f;
+  background-color: #000000;
   color: white;
   font-weight: bold;
   border-radius: 6px;
@@ -243,7 +243,7 @@ select {
 
 .comment {
   background: #f0f0f0;
-  border-left: 5px solid #35598f;
+  border-left: 5px solid #000000;
   padding: 1.2rem;
   margin-bottom: 1rem;
   border-radius: 8px;
@@ -295,7 +295,7 @@ select {
 
 .comment-form button {
   padding: 0.9rem 1.5rem;
-  background-color: #35598f;
+  background-color: #000000;
   color: white;
   border: none;
   font-weight: bold;
@@ -306,7 +306,7 @@ select {
 }
 
 .comment-form button:hover {
-  background-color: #2a4470;
+  background-color: #000000;
 }
 
 .rating-stars {

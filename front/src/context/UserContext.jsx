@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+﻿import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { fetchProfile as fetchProfileApi, login as loginApi, logout as logoutApi } from '../api/backend.js';
 
 export const UserContext = createContext();
 
@@ -9,8 +9,8 @@ export const UserProvider = ({ children }) => {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/utilisateurs/me');
-      setUser(data);
+      const profile = await fetchProfileApi();
+      setUser(profile);
     } catch {
       setUser(null);
     } finally {
@@ -22,19 +22,20 @@ export const UserProvider = ({ children }) => {
     fetchProfile();
   }, [fetchProfile]);
 
-  const login = (userData) => {
+  const login = async (email, password, captchaToken) => {
+    const userData = await loginApi(email, password, captchaToken);
     setUser(userData);
     setLoading(false);
+    return userData;
   };
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/utilisateurs/logout');
+      await logoutApi();
     } catch {
       // Ignore réseau pour l'UX
-    } finally {
-      setUser(null);
     }
+    setUser(null);
   };
 
   return (
@@ -55,5 +56,3 @@ export const UserProvider = ({ children }) => {
 };
 
 export const useUser = () => useContext(UserContext);
-
-

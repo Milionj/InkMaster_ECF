@@ -1,6 +1,7 @@
 ﻿import { useState } from "react";
 import { db } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { isMock, createRendezVous } from "../../api/backend.js";
 import "./RendezVousForm.css";
 
 const MAX_NAME = 100;
@@ -64,15 +65,26 @@ export default function RendezVousForm() {
     setIsSubmitting(true);
 
     try {
-      await addDoc(collection(db, "rendez_vous"), {
-        nom: nomTrim,
-        email: emailTrim,
-        telephone: telTrim,
-        date: formData.date,
-        heure: formData.heure,
-        message: messageTrim,
-        timestamp: serverTimestamp(),
-      });
+      if (isMock) {
+        await createRendezVous({
+          nom: nomTrim,
+          email: emailTrim,
+          telephone: telTrim,
+          date: formData.date,
+          heure: formData.heure,
+          message: messageTrim,
+        });
+      } else {
+        await addDoc(collection(db, "rendez_vous"), {
+          nom: nomTrim,
+          email: emailTrim,
+          telephone: telTrim,
+          date: formData.date,
+          heure: formData.heure,
+          message: messageTrim,
+          timestamp: serverTimestamp(),
+        });
+      }
 
       setConfirmation("Rendez-vous enregistré !");
       setFormData({

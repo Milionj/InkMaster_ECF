@@ -1,6 +1,7 @@
 ﻿import React, { useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
+import { isMock } from "../../api/backend.js";
 import "./Contact.css";
 
 const MAX_NAME = 100;
@@ -49,13 +50,26 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      await addDoc(collection(db, "contact"), {
-        nom: nomTrim,
-        prenom: prenomTrim,
-        email: emailTrim,
-        message: messageTrim,
-        createdAt: serverTimestamp(),
-      });
+      if (isMock) {
+        const key = "inkmaster-mock-contact";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        existing.push({
+          nom: nomTrim,
+          prenom: prenomTrim,
+          email: emailTrim,
+          message: messageTrim,
+          createdAt: new Date().toISOString(),
+        });
+        localStorage.setItem(key, JSON.stringify(existing));
+      } else {
+        await addDoc(collection(db, "contact"), {
+          nom: nomTrim,
+          prenom: prenomTrim,
+          email: emailTrim,
+          message: messageTrim,
+          createdAt: serverTimestamp(),
+        });
+      }
 
       setConfirmation("Message envoye !");
       setNom("");
@@ -82,7 +96,7 @@ const Contact = () => {
           required
         />
 
-        <label>Prénom</label>
+        <label>Prenom</label>
         <input
           value={prenom}
           maxLength={MAX_NAME}

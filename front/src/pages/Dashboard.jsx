@@ -1,5 +1,19 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+﻿import { useEffect, useState } from 'react';
+import {
+  createService as apiCreateService,
+  createTatouage as apiCreateTatouage,
+  createUser as apiCreateUser,
+  deleteService as apiDeleteService,
+  deleteTatouage as apiDeleteTatouage,
+  deleteUser as apiDeleteUser,
+  fetchServices,
+  fetchTatouagesAdmin,
+  fetchUsers,
+  updateService as apiUpdateService,
+  updateTatouage as apiUpdateTatouage,
+  updateUser as apiUpdateUser,
+  isMock,
+} from '../api/backend.js';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -21,122 +35,107 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-    const config = { withCredentials: true };
-    const usersRes = await axios.get('http://localhost:5000/api/utilisateurs', config);
-    const tattoosRes = await axios.get('http://localhost:5000/api/tatouages', config);
-    const servicesRes = await axios.get('http://localhost:5000/api/services', config);
-      setUsers(usersRes.data);
-      setTattoos(tattoosRes.data);
-      setServices(servicesRes.data);
+      const [usersRes, tattoosRes, servicesRes] = await Promise.all([
+        fetchUsers(),
+        fetchTatouagesAdmin(),
+        fetchServices(),
+      ]);
+      setUsers(usersRes);
+      setTattoos(tattoosRes);
+      setServices(servicesRes);
     } catch (err) {
       console.error(err);
       setErreur("Erreur lors du chargement des données.");
     }
   };
 
-  // CRUD UTILISATEURS
   const creerUser = async () => {
     if (isCreatingUser) return;
     setErreur('');
     setIsCreatingUser(true);
     try {
-      await axios.post('http://localhost:5000/api/utilisateurs', newUser, { withCredentials: true });
+      await apiCreateUser(newUser);
       setNewUser({ nom: '', prenom: '', email: '', password: '', role: 'artiste' });
       fetchData();
     } catch (err) {
       console.error(err);
-      setErreur("Erreur lors de la creation utilisateur.");
+      setErreur("Erreur lors de la création utilisateur.");
     } finally {
       setIsCreatingUser(false);
     }
   };
 
   const modifierUser = async (id, champ, valeur) => {
-    const userToUpdate = users.find(u => u.id === id);
-    await axios.put(
-      `http://localhost:5000/api/utilisateurs/${id}`,
-      { ...userToUpdate, [champ]: valeur },
-      { withCredentials: true }
-    );
+    const userToUpdate = users.find((u) => u.id === id);
+    await apiUpdateUser(id, { ...userToUpdate, [champ]: valeur });
     fetchData();
   };
 
   const supprimerUser = async (id) => {
-    await axios.delete(`http://localhost:5000/api/utilisateurs/${id}`, { withCredentials: true });
+    await apiDeleteUser(id);
     fetchData();
   };
 
-  // CRUD TATOUAGES
   const creerTattoo = async () => {
     if (isCreatingTattoo) return;
     setErreur('');
     setIsCreatingTattoo(true);
     try {
-      await axios.post('http://localhost:5000/api/tatouages', newTattoo, { withCredentials: true });
+      await apiCreateTatouage({ ...newTattoo, id_utilisateur: Number(newTattoo.id_utilisateur) });
       setNewTattoo({ titre: '', description: '', image: '', id_utilisateur: '' });
       fetchData();
     } catch (err) {
       console.error(err);
-      setErreur("Erreur lors de la creation du tatouage.");
+      setErreur("Erreur lors de la création du tatouage.");
     } finally {
       setIsCreatingTattoo(false);
     }
   };
 
   const modifierTattoo = async (id, champ, valeur) => {
-    const tattooToUpdate = tattoos.find(t => t.id === id);
-    await axios.put(
-      `http://localhost:5000/api/tatouages/${id}`,
-      { ...tattooToUpdate, [champ]: valeur },
-      { withCredentials: true }
-    );
+    const tattooToUpdate = tattoos.find((t) => t.id === id || t.id_tatouage === id);
+    await apiUpdateTatouage(id, { ...tattooToUpdate, [champ]: valeur });
     fetchData();
   };
 
   const supprimerTattoo = async (id) => {
-    await axios.delete(`http://localhost:5000/api/tatouages/${id}`, { withCredentials: true });
+    await apiDeleteTatouage(id);
     fetchData();
   };
 
-  // CRUD SERVICES
   const creerService = async () => {
     if (isCreatingService) return;
     setErreur('');
     setIsCreatingService(true);
     try {
-      await axios.post('http://localhost:5000/api/services', newService, { withCredentials: true });
+      await apiCreateService(newService);
       setNewService({ nom: '', description: '' });
       fetchData();
     } catch (err) {
       console.error(err);
-      setErreur("Erreur lors de la creation du service.");
+      setErreur("Erreur lors de la création du service.");
     } finally {
       setIsCreatingService(false);
     }
   };
 
   const modifierService = async (id, champ, valeur) => {
-    const serviceToUpdate = services.find(s => s.id === id);
-    await axios.put(
-      `http://localhost:5000/api/services/${id}`,
-      { ...serviceToUpdate, [champ]: valeur },
-      { withCredentials: true }
-    );
+    const serviceToUpdate = services.find((s) => s.id === id);
+    await apiUpdateService(id, { ...serviceToUpdate, [champ]: valeur });
     fetchData();
   };
 
   const supprimerService = async (id) => {
-    await axios.delete(`http://localhost:5000/api/services/${id}`, { withCredentials: true });
+    await apiDeleteService(id);
     fetchData();
   };
 
   return (
     <div className="dashboard-container">
-      <h1>Dashboard Admin InkMaster</h1>
+      <h1>Dashboard Admin InkMaster {isMock ? '(mode mock)' : ''}</h1>
 
       {erreur && <p className="error">{erreur}</p>}
 
-      {/* UTILISATEURS */}
       <section>
         <h2>Utilisateurs</h2>
         <form onSubmit={(e) => { e.preventDefault(); creerUser(); }}>
@@ -149,7 +148,7 @@ export default function Dashboard() {
             <option value="admin">Admin</option>
           </select>
           <button type="submit" disabled={isCreatingUser}>
-            {isCreatingUser ? "Creation..." : "Creer"}
+            {isCreatingUser ? "Création..." : "Créer"}
           </button>
         </form>
 
@@ -160,7 +159,7 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
+            {users.map((user) => (
               <tr key={user.id}>
                 <td>{user.id}</td>
                 <td><input value={user.nom} onChange={(e) => modifierUser(user.id, 'nom', e.target.value)} /></td>
@@ -174,7 +173,6 @@ export default function Dashboard() {
         </table>
       </section>
 
-      {/* TATOUAGES */}
       <section>
         <h2>Tatouages</h2>
         <form onSubmit={(e) => { e.preventDefault(); creerTattoo(); }}>
@@ -183,7 +181,7 @@ export default function Dashboard() {
           <input placeholder="Image URL" value={newTattoo.image} onChange={(e) => setNewTattoo({ ...newTattoo, image: e.target.value })} />
           <input placeholder="ID Artiste" value={newTattoo.id_utilisateur} onChange={(e) => setNewTattoo({ ...newTattoo, id_utilisateur: e.target.value })} />
           <button type="submit" disabled={isCreatingTattoo}>
-            {isCreatingTattoo ? "Creation..." : "Creer"}
+            {isCreatingTattoo ? "Création..." : "Créer"}
           </button>
         </form>
 
@@ -192,37 +190,36 @@ export default function Dashboard() {
             <tr><th>ID</th><th>Titre</th><th>Description</th><th>Image</th><th>Artiste</th><th>Actions</th></tr>
           </thead>
           <tbody>
-            {tattoos.map(t => (
-              <tr key={t.id}>
-                <td>{t.id}</td>
-                <td><input value={t.titre} onChange={(e) => modifierTattoo(t.id, 'titre', e.target.value)} /></td>
-                <td><input value={t.description} onChange={(e) => modifierTattoo(t.id, 'description', e.target.value)} /></td>
+            {tattoos.map((t) => (
+              <tr key={t.id || t.id_tatouage}>
+                <td>{t.id || t.id_tatouage}</td>
+                <td><input value={t.titre} onChange={(e) => modifierTattoo(t.id || t.id_tatouage, 'titre', e.target.value)} /></td>
+                <td><input value={t.description} onChange={(e) => modifierTattoo(t.id || t.id_tatouage, 'description', e.target.value)} /></td>
                 <td><img src={t.image} alt={t.titre} /><br />
-                    <input value={t.image} onChange={(e) => modifierTattoo(t.id, 'image', e.target.value)} />
+                    <input value={t.image} onChange={(e) => modifierTattoo(t.id || t.id_tatouage, 'image', e.target.value)} />
                 </td>
-                <td><input value={t.id_utilisateur} onChange={(e) => modifierTattoo(t.id, 'id_utilisateur', e.target.value)} /></td>
-                <td><button onClick={() => supprimerTattoo(t.id)}>Supprimer</button></td>
+                <td><input value={t.id_utilisateur} onChange={(e) => modifierTattoo(t.id || t.id_tatouage, 'id_utilisateur', e.target.value)} /></td>
+                <td><button onClick={() => supprimerTattoo(t.id || t.id_tatouage)}>Supprimer</button></td>
               </tr>
             ))}
           </tbody>
         </table>
       </section>
 
-      {/* SERVICES */}
       <section>
         <h2>Services</h2>
         <form onSubmit={(e) => { e.preventDefault(); creerService(); }}>
           <input placeholder="Nom" value={newService.nom} onChange={(e) => setNewService({ ...newService, nom: e.target.value })} />
           <input placeholder="Description" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} />
           <button type="submit" disabled={isCreatingService}>
-            {isCreatingService ? "Creation..." : "Creer"}
+            {isCreatingService ? "Création..." : "Créer"}
           </button>
         </form>
 
         <table>
           <thead><tr><th>ID</th><th>Nom</th><th>Description</th><th>Actions</th></tr></thead>
           <tbody>
-            {services.map(s => (
+            {services.map((s) => (
               <tr key={s.id}>
                 <td>{s.id}</td>
                 <td><input value={s.nom} onChange={(e) => modifierService(s.id, 'nom', e.target.value)} /></td>

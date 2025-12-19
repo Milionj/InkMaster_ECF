@@ -24,7 +24,7 @@
 
 /* Le "Ink" en bleu dans le logo */
 .logo-blue {
-  color: #35598f;
+  color: #000000;
 }
 
 /* Liste de lien de navigation */
@@ -43,14 +43,14 @@
 
 /* bouton bleu se connecter */
 .login-btn {
-  background: #35598f;
+  background: #000000;
   padding: 5px 10px; /* contour plus compact */
   color: white;
   border-radius: 3px;
 }
 
 .login-btn:hover {
-  background: #5F6982;
+  background: #000000;
 }
 
 /* Icone burger les 3 barres */

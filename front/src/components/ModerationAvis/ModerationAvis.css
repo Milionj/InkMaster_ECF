@@ -1,4 +1,4 @@
-.moderation-container {
+﻿.moderation-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
@@ -38,7 +38,7 @@
 }
 
 .actions button:hover {
-  background-color: #340873; /* Violet foncé InkMaster */
+  background-color: #000000; /* Violet foncÃ© InkMaster */
 }
 
 .message {

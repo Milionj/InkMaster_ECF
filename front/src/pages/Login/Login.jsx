@@ -1,97 +1,51 @@
-import { useState, useRef } from "react";
-import axios from "axios";
+﻿import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUser } from "../../Context/UserContext";
 import "./Login.css";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Login() {
   const { login } = useUser();
-  // États pour stocker les champs du formulaire
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
-
-  // États pour les messages d’erreur
   const [erreur, setErreur] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Ref pour pouvoir reset le reCAPTCHA après soumission
   const recaptchaRef = useRef(null);
   const navigate = useNavigate();
 
-  // Fonction pour vérifier que l’email est valide
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
+  const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  const validatePassword = (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{12,}$/.test(value);
 
-  // Mot de passe fort : 12 caractères min, maj, min, chiffre, caractère spécial
-  const validatePassword = (password) => {
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{12,}$/;
-    return regex.test(password);
-  };
-
-  // Fonction déclenchée lors de la soumission du formulaire
   const handleLogin = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
+    setErreur("");
 
-    // Si le reCAPTCHA n’a pas été validé, on empêche l’envoi
     if (!captchaToken) {
       setErreur("Veuillez valider le reCAPTCHA.");
       return;
     }
 
-    // Vérification du format de l’email
     if (!validateEmail(email)) {
       setEmailError("Format d'email invalide.");
       return;
-    } else {
-      setEmailError("");
     }
-    
-    // Vérification du format du mot de passe
-    if (!validatePassword(password)) {
-      setPasswordError(
-        "Mot de passe invalide !"
-      );
-      return;
-    } else {
-      setPasswordError("");
-    }
+    setEmailError("");
 
-    // Affiche le token reCAPTCHA dans la console  (debug)
-    console.log("Token captcha envoyé au backend :", captchaToken);
+    if (!validatePassword(password)) {
+      setPasswordError("Mot de passe invalide !");
+      return;
+    }
+    setPasswordError("");
 
     setIsSubmitting(true);
 
     try {
-      // Envoie des données de connexion + token captcha au backend
-      const res = await axios.post(
-        "http://localhost:5000/api/utilisateurs/login",
-        {
-          email,
-          password,
-          captchaToken,
-        },
-        { withCredentials: true }
-      );
-
-      // Si la connexion réussit, le backend dépose un cookie httpOnly : on stocke le profil dans le contexte
-      const { user } = res.data;
-
-      // Connexion à Firebase Auth (optionnel, commenté pour l’instant)
-      // const firebaseAuth = getAuth();
-      // await signInWithEmailAndPassword(firebaseAuth, email, password);
-
-      login(user);
-
-      // Redirection selon le rôle
+      const user = await login(email, password, captchaToken);
       if (user.role === "admin") {
         navigate("/dashboard");
       } else if (user.role === "artiste") {
@@ -101,20 +55,14 @@ export default function Login() {
       }
     } catch (err) {
       console.error(err);
-      // Si c’est une erreur liée au captcha, on affiche un message spécifique
-      if (err.response?.data?.message === "Captcha invalide") {
-        setErreur("Captcha invalide. Merci de cocher à nouveau.");
-      } else {
-        setErreur("Email ou mot de passe incorrect.");
-      }
+      setErreur("Email, mot de passe ou captcha incorrect.");
     } finally {
       setIsSubmitting(false);
     }
 
-    // On reset le reCAPTCHA pour permettre une nouvelle tentative
     if (recaptchaRef.current) {
       recaptchaRef.current.reset();
-      setCaptchaToken(""); // On remet l’état à vide
+      setCaptchaToken("");
     }
   };
 
@@ -143,13 +91,9 @@ export default function Login() {
         />
         {passwordError && <p className="error-msg">{passwordError}</p>}
 
-        {/* Composant reCAPTCHA : on récupère le token dès que l’utilisateur coche la case */}
         <ReCAPTCHA
           sitekey="6LeMsvgrAAAAAGruIo9rqL21gxZB7Mmhr9CJ9rK6"
-          onChange={(token) => {
-            console.log("Token reCAPTCHA reçu :", token);
-            setCaptchaToken(token);
-          }}
+          onChange={(token) => setCaptchaToken(token || "")}
           ref={recaptchaRef}
         />
 
@@ -157,10 +101,8 @@ export default function Login() {
           {isSubmitting ? "Connexion..." : "Connexion"}
         </button>
 
-        {/* Affichage d’un message d’erreur global si besoin */}
         {erreur && <p className="error-msg">{erreur}</p>}
       </form>
     </div>
   );
 }
-

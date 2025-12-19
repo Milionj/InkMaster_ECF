@@ -8,7 +8,7 @@
   --color-secondary: #5F6982;
   --color-light: #F2F2F2;
   --color-grey: #E5E5E5;
-  --color-blue: #35598f;
+  --color-blue: #000000;
 
   /* Police globale par défaut */
   font-family: 'Squada One', sans-serif;
@@ -25,4 +25,3 @@ text-decoration: none;
 color: white;
 font-weight: bold;
 }
-

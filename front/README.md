@@ -3,7 +3,7 @@
 ## Installation locale
 1) `cd front`
 2) `npm install`
-3) créez `.env` (copie de `.env.example`). Pour du local 100% sans backend, laissez `VITE_USE_MOCK=true`.
+3) créez `.env` (copie de `.env.example`). Pour un usage local sans backend, laissez `VITE_USE_MOCK=true`.
 
 ## Lancer en local
 - `npm run dev` puis ouvrez http://localhost:5173
@@ -13,7 +13,8 @@
 ## Modes backend
 - **Mock** (par défaut en dev) : aucune requête réseau, données en mémoire + `localStorage` (`inkmaster-mock-db`, `inkmaster-mock-rdv`, `inkmaster-mock-contact`).
 - **Backend réel** : mettez `VITE_USE_MOCK=false` et renseignez `VITE_API_BASE_URL`.
-- Firestore est utilisé seulement si `VITE_USE_MOCK=false` pour avis/rendez-vous ; sinon stockage local.
+- **Fonctions Netlify (mock serverless)** : déployées dans `netlify/functions`. Si vous voulez que le front pointe dessus, utilisez `VITE_USE_MOCK=false` et `VITE_API_BASE_URL=/.netlify/functions`.
+- Firestore est utilisé seulement si `VITE_USE_MOCK=false` pour avis/rendez-vous ; sinon stockage local ou fonctions Netlify.
 
 ## Variables (.env / Netlify env)
 ```
@@ -26,7 +27,13 @@ VITE_FIREBASE_STORAGE_BUCKET=demo
 VITE_FIREBASE_MESSAGING_SENDER_ID=demo
 VITE_FIREBASE_APP_ID=demo
 ```
-Sur Netlify, définissez ces variables dans Site settings > Environment variables pour afficher les données mock au premier chargement.
+- Pour utiliser les fonctions Netlify, mettez `VITE_API_BASE_URL=/.netlify/functions` et (optionnel) `VITE_USE_MOCK=false`.
+
+## Fonctions Netlify fournies (mock)
+- `netlify/functions/tatouages.js` : GET tatouages mock (public)
+- `netlify/functions/avis.js` : GET/POST/DELETE avis mock
+- `netlify/functions/services.js` : CRUD simple services mock
+- `netlify/functions/rendezvous.js` : GET/POST/PUT/DELETE rendez-vous mock
 
 ## Scripts
 - `npm run dev`
